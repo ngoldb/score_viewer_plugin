@@ -1,0 +1,25 @@
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget
+from .gui_scatter import ScatterTab
+from .gui_heatmap import HeatmapTab
+
+class ScoreViewerPlugin(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Score Viewer (Qt)")
+        self.resize(1000, 800)
+
+        # Data containers
+        self.df = None
+        self.selected_indices = []
+
+        # Tabs
+        layout = QVBoxLayout(self)
+        self.tabs = QTabWidget()
+        layout.addWidget(self.tabs)
+
+        # Keep tab objects for access to controls
+        self.scatter_tab_obj = ScatterTab(self)
+        self.heatmap_tab_obj = HeatmapTab(self)
+
+        self.tabs.addTab(self.scatter_tab_obj.widget, "Scatter Plot")
+        self.tabs.addTab(self.heatmap_tab_obj.widget, "RMSD Heatmap")

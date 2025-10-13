@@ -1,0 +1,84 @@
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QFormLayout, QPushButton, QComboBox, QSpinBox, QFileDialog
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from matplotlib.widgets import LassoSelector
+from matplotlib.path import Path
+import numpy as np
+import pandas as pd
+from .utils import status_msg, assign_colors
+from .classification import mark_good, mark_bad
+from .pymol_sync import sync_with_pymol
+
+class ScatterTab:
+    def __init__(self, plugin):
+        self.plugin = plugin
+        self.widget = QWidget()
+        layout = QVBoxLayout(self.widget)
+
+        # Controls
+        control_box = QGroupBox("Controls")
+        form = QFormLayout()
+        self.load_btn = QPushButton("Load CSV")
+        self.load_btn.clicked.connect(self.load_csv)
+        self.x_combo = QComboBox()
+        self.y_combo = QComboBox()
+        self.plot_btn = QPushButton("Plot")
+        self.plot_btn.clicked.connect(self.plot_scores)
+        self.classify_good_btn = QPushButton("Mark Good")
+        self.classify_good_btn.clicked.connect(lambda: mark_good(self.plugin))
+        self.classify_bad_btn = QPushButton("Mark Bad")
+        self.classify_bad_btn.clicked.connect(lambda: mark_bad(self.plugin))
+        self.sync_btn = QPushButton("Sync with PyMOL")
+        self.sync_btn.clicked.connect(lambda: sync_with_pymol(self.plugin))
+        self.max_models_spin = QSpinBox()
+        self.max_models_spin.setRange(1,200)
+        self.max_models_spin.setValue(10)
+
+        form.addRow("Load CSV:", self.load_btn)
+        form.addRow("X-axis:", self.x_combo)
+        form.addRow("Y-axis:", self.y_combo)
+        form.addRow("Plot:", self.plot_btn)
+        form.addRow("Max models:", self.max_models_spin)
+        form.addRow("Mark Good:", self.classify_good_btn)
+        form.addRow("Mark Bad:", self.classify_bad_btn)
+        form.addRow("Sync with PyMOL:", self.sync_btn)
+        control_box.setLayout(form)
+        layout.addWidget(control_box)
+
+        # Scatter plot canvas
+        self.fig = Figure()
+        self.canvas = FigureCanvas(self.fig)
+        layout.addWidget(self.canvas)
+        self.ax = self.fig.add_subplot(111)
+        self.scatter = None
+        self.lasso = None
+
+    def load_csv(self):
+        path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
+        if not path: return
+        df = pd.read_csv(path)
+        if "path" not in df.columns: return
+        self.plugin.df = df
+        numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
+        self.x_combo.clear(); self.x_combo.addItems(numeric_cols)
+        self.y_combo.clear(); self.y_combo.addItems(numeric_cols)
+        status_msg(f"Loaded {len(df)} models")
+
+    def plot_scores(self):
+        if self.plugin.df is None: return
+        x = self.x_combo.currentText()
+        y = self.y_combo.currentText()
+        self.ax.clear()
+        colors = assign_colors(self.plugin)
+        self.scatter = self.ax.scatter(self.plugin.df[x], self.plugin.df[y], c=colors)
+        self.ax.set_xlabel(x)  # Axis labels
+        self.ax.set_ylabel(y)
+        self.canvas.draw()
+        if self.lasso: self.lasso.disconnect_events()
+        self.lasso = LassoSelector(self.ax, onselect=self.on_lasso_select)
+
+    def on_lasso_select(self, verts):
+        df = self.plugin.df
+        path_obj = Path(verts)
+        pts = np.column_stack((df[self.x_combo.currentText()], df[self.y_combo.currentText()]))
+        self.plugin.selected_indices = np.nonzero(path_obj.contains_points(pts))[0]
