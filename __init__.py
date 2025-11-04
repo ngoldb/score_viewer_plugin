@@ -6,4 +6,4 @@ def __init_plugin__(app=None):
     global plugin_dialog
     if plugin_dialog is None:
         plugin_dialog = ScoreViewerPlugin()
-    addmenuitemqt("Score Viewer (Qt)", lambda: plugin_dialog.show())
+    addmenuitemqt("Score Viewer", lambda: plugin_dialog.show())

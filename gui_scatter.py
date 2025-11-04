@@ -18,8 +18,6 @@ class ScatterTab:
         # Controls
         control_box = QGroupBox("Controls")
         form = QFormLayout()
-        self.load_btn = QPushButton("Load CSV")
-        self.load_btn.clicked.connect(self.load_csv)
         self.x_combo = QComboBox()
         self.y_combo = QComboBox()
         self.plot_btn = QPushButton("Plot")
@@ -34,7 +32,7 @@ class ScatterTab:
         self.max_models_spin.setRange(1,200)
         self.max_models_spin.setValue(10)
 
-        form.addRow("Load CSV:", self.load_btn)
+        #form.addRow("Load CSV:", self.load_btn)
         form.addRow("X-axis:", self.x_combo)
         form.addRow("Y-axis:", self.y_combo)
         form.addRow("Plot:", self.plot_btn)
@@ -52,17 +50,6 @@ class ScatterTab:
         self.ax = self.fig.add_subplot(111)
         self.scatter = None
         self.lasso = None
-
-    def load_csv(self):
-        path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
-        if not path: return
-        df = pd.read_csv(path)
-        if "path" not in df.columns: return
-        self.plugin.df = df
-        numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
-        self.x_combo.clear(); self.x_combo.addItems(numeric_cols)
-        self.y_combo.clear(); self.y_combo.addItems(numeric_cols)
-        status_msg(f"Loaded {len(df)} models")
 
     def plot_scores(self):
         if self.plugin.df is None: return
