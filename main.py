@@ -7,7 +7,7 @@ class ScoreViewerPlugin(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Score Viewer")
-        self.resize(1000, 800)
+        self.resize(600, 800)
 
         # Data containers
         self.df = None
