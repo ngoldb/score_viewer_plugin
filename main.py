@@ -13,6 +13,7 @@ class ScoreViewerPlugin(QDialog):
         self.onloadCommand = None
         self.path_replace = None
         self.path_column = None
+        self.reference_structure = None
 
         # Data containers
         self.df = None

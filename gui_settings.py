@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QLineEdit, QComboBox, QFormLayout, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QLineEdit, QComboBox, QCheckBox, QFormLayout, QPushButton, QFileDialog
 import numpy as np
 import pandas as pd
 from .utils import status_msg
-
+from pymol import cmd
 
 class SettingTab:
     def __init__(self, plugin):
@@ -10,6 +10,7 @@ class SettingTab:
         self.widget = QWidget()
         layout = QVBoxLayout(self.widget)
 
+        # Data Source Box
         data_box = QGroupBox("Data Source")
         form = QFormLayout()
         self.load_btn = QPushButton("Browse")
@@ -26,36 +27,51 @@ class SettingTab:
         self.path_replace.textChanged.connect(self.set_replace_text)
         self.path_with.textChanged.connect(self.set_replace_text)
 
-        # TODO: reference model
-        # reference structure path
-        # self.ref_btn = QPushButton("Browse")
-        # self.ref_btn.clicked.connect(self.load_ref)
-        # self.ref_file_edit = QLineEdit(
-        #     placeholderText="reference structure",
-        #     readOnly=True
-        # )
-
         form.addRow("Load CSV:", self.load_btn)
         form.addRow("CSV File:", self.csv_file_edit)
         form.addRow("Path:", self.path_combo)
         form.addRow("Path Replace:", self.path_replace)
         form.addRow("with:", self.path_with)
-        # TODO: reference model
-        # form.addRow("Load Reference:", self.ref_btn)
-        # form.addRow("Reference File:", self.ref_file_edit)
+
         data_box.setLayout(form)
 
+        # Reference Structure Box
+        reference_box = QGroupBox("Reference Structure")
+        form = QFormLayout()
+        
+        self.ref_btn = QPushButton("Browse")
+        self.ref_btn.clicked.connect(self.load_ref)
+        self.ref_file_edit = QLineEdit(
+            placeholderText="reference structure",
+            readOnly=True
+        )
+        self.align_ref = QCheckBox()
+        self.ref_color_combo = QComboBox()
+        color_tuples = cmd.get_color_indices()
+        color_names = [name for name, index in color_tuples]
+        self.ref_color_combo.addItems(sorted(color_names))
+        self.ref_color_combo.setCurrentIndex(self.ref_color_combo.findText('gray'))
+
+        form.addRow("Load Reference:", self.ref_btn)
+        form.addRow("Reference File:", self.ref_file_edit)
+        form.addRow("Align models to reference:", self.align_ref)
+        form.addRow("Color reference:", self.ref_color_combo)
+
+        reference_box.setLayout(form)
+
+        # Appearance Box
         appearance_box = QGroupBox("Appearance")
         form = QFormLayout()
         self.command_edit = QLineEdit(
             placeholderText="Command to run when loading structures",
             clearButtonEnabled=True
         )
-        self.command_edit.textChanged.connect(self.set_load_command)
+        # self.command_edit.textChanged.connect(self.set_load_command)
         form.addRow("Load Command:", self.command_edit)
         appearance_box.setLayout(form)
 
         layout.addWidget(data_box)
+        layout.addWidget(reference_box)
         layout.addWidget(appearance_box)
 
     def load_csv(self):
@@ -82,8 +98,8 @@ class SettingTab:
         self.ref_file_edit.setText(str(ref_path))
         status_msg("loaded reference structure")
 
-    def set_load_command(self):
-        self.plugin.onloadCommand = self.command_edit.text()
+    # def set_load_command(self):
+    #     self.plugin.onloadCommand = self.command_edit.text()
 
     def set_replace_text(self):
         self.plugin.path_replace = (self.path_replace.text(), self.path_with.text())
