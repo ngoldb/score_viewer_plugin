@@ -3,6 +3,7 @@ from .utils import status_msg
 import os
 
 def sync_with_pymol(plugin):
+    #TODO: on load command
     if plugin.df is None or len(plugin.selected_indices) == 0:
         status_msg("No models selected for PyMOL sync.")
         return
@@ -19,5 +20,9 @@ def sync_with_pymol(plugin):
         p = row["path"]
         if os.path.exists(p):
             cmd.load(p)
+    
+    if plugin.onloadCommand != None:
+        cmd.do(plugin.onloadCommand)
+        status_msg('on Load Command')
 
     status_msg(f"Loaded {len(selected)} models into PyMOL")

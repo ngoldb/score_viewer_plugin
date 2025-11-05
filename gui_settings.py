@@ -14,11 +14,17 @@ class SettingTab:
         form = QFormLayout()
         self.load_btn = QPushButton("Browse")
         self.load_btn.clicked.connect(self.load_csv)
-        self.csv_file_edit = QLineEdit()
+        self.csv_file_edit = QLineEdit(
+            placeholderText='CSV file',
+            readOnly=True
+        )
         self.path_combo = QComboBox()
         self.ref_btn = QPushButton("Browse")
         self.ref_btn.clicked.connect(self.load_ref)
-        self.ref_file_edit = QLineEdit()
+        self.ref_file_edit = QLineEdit(
+            placeholderText="reference structure",
+            readOnly=True
+        )
 
         form.addRow("Load CSV:", self.load_btn)
         form.addRow("CSV File:", self.csv_file_edit)
@@ -29,7 +35,11 @@ class SettingTab:
 
         appearance_box = QGroupBox("Appearance")
         form = QFormLayout()
-        self.command_edit = QLineEdit()
+        self.command_edit = QLineEdit(
+            placeholderText="Command to run when loading structures",
+            clearButtonEnabled=True
+        )
+        self.command_edit.textChanged.connect(self.set_load_command)
         form.addRow("Load Command:", self.command_edit)
         appearance_box.setLayout(form)
 
@@ -59,3 +69,6 @@ class SettingTab:
         self.plugin.reference_structure = ref_path
         self.ref_file_edit.setText(str(ref_path))
         status_msg("loaded reference structure")
+
+    def set_load_command(self):
+        self.plugin.onloadCommand = self.command_edit.text()
