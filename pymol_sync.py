@@ -29,7 +29,7 @@ def sync_with_pymol(plugin):
     
     # Execute on-load command
     if plugin.onloadCommand != None:
-        cmd.do(plugin.onloadCommand)
+        cmd.do(plugin.setting_tab_obj.command_edit.text())
         status_msg('on Load Command')
 
     status_msg(f"Loaded {loaded} models into PyMOL")

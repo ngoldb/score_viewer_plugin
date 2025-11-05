@@ -21,6 +21,7 @@ class HeatmapTab:
         layout.addWidget(self.canvas)
 
     def compute_heatmap(self):
+        #TODO: fix bug (renaming objects in PyMOL)
         if len(self.plugin.selected_indices) == 0: return
         df = self.plugin.df.iloc[self.plugin.selected_indices]
         file_paths = df["path"].tolist()

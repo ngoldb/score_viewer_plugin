@@ -26,21 +26,23 @@ class SettingTab:
         self.path_replace.textChanged.connect(self.set_replace_text)
         self.path_with.textChanged.connect(self.set_replace_text)
 
+        # TODO: reference model
         # reference structure path
-        self.ref_btn = QPushButton("Browse")
-        self.ref_btn.clicked.connect(self.load_ref)
-        self.ref_file_edit = QLineEdit(
-            placeholderText="reference structure",
-            readOnly=True
-        )
+        # self.ref_btn = QPushButton("Browse")
+        # self.ref_btn.clicked.connect(self.load_ref)
+        # self.ref_file_edit = QLineEdit(
+        #     placeholderText="reference structure",
+        #     readOnly=True
+        # )
 
         form.addRow("Load CSV:", self.load_btn)
         form.addRow("CSV File:", self.csv_file_edit)
         form.addRow("Path:", self.path_combo)
         form.addRow("Path Replace:", self.path_replace)
         form.addRow("with:", self.path_with)
-        form.addRow("Load Reference:", self.ref_btn)
-        form.addRow("Reference File:", self.ref_file_edit)
+        # TODO: reference model
+        # form.addRow("Load Reference:", self.ref_btn)
+        # form.addRow("Reference File:", self.ref_file_edit)
         data_box.setLayout(form)
 
         appearance_box = QGroupBox("Appearance")

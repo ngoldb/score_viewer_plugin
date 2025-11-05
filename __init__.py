@@ -7,3 +7,5 @@ def __init_plugin__(app=None):
     if plugin_dialog is None:
         plugin_dialog = ScoreViewerPlugin()
     addmenuitemqt("Score Viewer", lambda: plugin_dialog.show())
+
+__author__ = "Nicolas Goldbach"

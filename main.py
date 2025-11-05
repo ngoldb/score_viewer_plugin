@@ -8,6 +8,8 @@ class ScoreViewerPlugin(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Score Viewer")
         self.resize(600, 800)
+
+        # Helper variables
         self.onloadCommand = None
         self.path_replace = None
         self.path_column = None
@@ -28,5 +30,5 @@ class ScoreViewerPlugin(QDialog):
 
         self.tabs.addTab(self.setting_tab_obj.widget, "Settings")
         self.tabs.addTab(self.scatter_tab_obj.widget, "Scatter Plot")
-        self.tabs.addTab(self.heatmap_tab_obj.widget, "RMSD Heatmap")
+        # self.tabs.addTab(self.heatmap_tab_obj.widget, "RMSD Heatmap")
         

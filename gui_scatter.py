@@ -22,8 +22,9 @@ class ScatterTab:
         self.y_combo = QComboBox()
         self.plot_btn = QPushButton("Plot")
         self.plot_btn.clicked.connect(self.plot_scores)
-        self.classify_good_btn = QPushButton("Mark Good")
-        self.classify_good_btn.clicked.connect(lambda: mark_good(self.plugin))
+        # TODO: classification
+        # self.classify_good_btn = QPushButton("Mark Good")
+        # self.classify_good_btn.clicked.connect(lambda: mark_good(self.plugin))
         self.classify_bad_btn = QPushButton("Mark Bad")
         self.classify_bad_btn.clicked.connect(lambda: mark_bad(self.plugin))
         self.sync_btn = QPushButton("Sync with PyMOL")
@@ -37,8 +38,9 @@ class ScatterTab:
         form.addRow("Y-axis:", self.y_combo)
         form.addRow("Plot:", self.plot_btn)
         form.addRow("Max models:", self.max_models_spin)
-        form.addRow("Mark Good:", self.classify_good_btn)
-        form.addRow("Mark Bad:", self.classify_bad_btn)
+        # TODO: classification
+        #form.addRow("Mark Good:", self.classify_good_btn)
+        #form.addRow("Mark Bad:", self.classify_bad_btn)
         form.addRow("Sync with PyMOL:", self.sync_btn)
         control_box.setLayout(form)
         layout.addWidget(control_box)
@@ -65,6 +67,8 @@ class ScatterTab:
         self.lasso = LassoSelector(self.ax, onselect=self.on_lasso_select)
 
     def on_lasso_select(self, verts):
+        #TODO: color highlighting of selected data points
+        #TODO: display selected / total number of datapoints
         df = self.plugin.df
         path_obj = Path(verts)
         pts = np.column_stack((df[self.x_combo.currentText()], df[self.y_combo.currentText()]))
