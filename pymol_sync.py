@@ -3,7 +3,6 @@ from .utils import status_msg
 import os
 
 def sync_with_pymol(plugin):
-    #TODO: on load command
     if plugin.df is None or len(plugin.selected_indices) == 0:
         status_msg("No models selected for PyMOL sync.")
         return
@@ -15,14 +14,22 @@ def sync_with_pymol(plugin):
     if len(selected) > max_models:
         selected = selected.sample(max_models)  # Random selection
 
+    # loading selected models
     cmd.delete("all")
+    loaded = 0
     for _, row in selected.iterrows():
-        p = row["path"]
+        p = row[plugin.setting_tab_obj.path_combo.currentText()]
+        if plugin.path_replace != None:
+            p = p.replace(plugin.path_replace[0], plugin.path_replace[1])
         if os.path.exists(p):
             cmd.load(p)
+            loaded += 1
+        else:
+            status_msg(f"file not found: {p}")
     
+    # Execute on-load command
     if plugin.onloadCommand != None:
         cmd.do(plugin.onloadCommand)
         status_msg('on Load Command')
 
-    status_msg(f"Loaded {len(selected)} models into PyMOL")
+    status_msg(f"Loaded {loaded} models into PyMOL")

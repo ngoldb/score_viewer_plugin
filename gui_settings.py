@@ -19,6 +19,14 @@ class SettingTab:
             readOnly=True
         )
         self.path_combo = QComboBox()
+
+        # replacing paths on load
+        self.path_replace = QLineEdit(placeholderText='/remote/data', clearButtonEnabled=True)
+        self.path_with = QLineEdit(placeholderText='/mount/data', clearButtonEnabled=True)
+        self.path_replace.textChanged.connect(self.set_replace_text)
+        self.path_with.textChanged.connect(self.set_replace_text)
+
+        # reference structure path
         self.ref_btn = QPushButton("Browse")
         self.ref_btn.clicked.connect(self.load_ref)
         self.ref_file_edit = QLineEdit(
@@ -29,6 +37,8 @@ class SettingTab:
         form.addRow("Load CSV:", self.load_btn)
         form.addRow("CSV File:", self.csv_file_edit)
         form.addRow("Path:", self.path_combo)
+        form.addRow("Path Replace:", self.path_replace)
+        form.addRow("with:", self.path_with)
         form.addRow("Load Reference:", self.ref_btn)
         form.addRow("Reference File:", self.ref_file_edit)
         data_box.setLayout(form)
@@ -72,3 +82,6 @@ class SettingTab:
 
     def set_load_command(self):
         self.plugin.onloadCommand = self.command_edit.text()
+
+    def set_replace_text(self):
+        self.plugin.path_replace = (self.path_replace.text(), self.path_with.text())
