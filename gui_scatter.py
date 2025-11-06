@@ -25,8 +25,8 @@ class ScatterTab:
         # TODO: classification
         # self.classify_good_btn = QPushButton("Mark Good")
         # self.classify_good_btn.clicked.connect(lambda: mark_good(self.plugin))
-        self.classify_bad_btn = QPushButton("Mark Bad")
-        self.classify_bad_btn.clicked.connect(lambda: mark_bad(self.plugin))
+        # self.classify_bad_btn = QPushButton("Mark Bad")
+        # self.classify_bad_btn.clicked.connect(lambda: mark_bad(self.plugin))
         self.sync_btn = QPushButton("Sync with PyMOL")
         self.sync_btn.clicked.connect(lambda: sync_with_pymol(self.plugin))
         self.max_models_spin = QSpinBox()
@@ -111,8 +111,6 @@ class ScatterTab:
 
 
     def on_lasso_select(self, verts):
-        #TODO: color highlighting of selected data points
-        #TODO: display selected / total number of datapoints
         df = self.plugin.df
         path_obj = Path(verts)
         pts = np.column_stack((df[self.x_combo.currentText()], df[self.y_combo.currentText()]))

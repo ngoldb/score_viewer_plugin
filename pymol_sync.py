@@ -28,7 +28,7 @@ def sync_with_pymol(plugin):
             status_msg(f"file not found: {p}")
 
     # Execute on-load command
-    if plugin.onloadCommand != None:
+    if plugin.setting_tab_obj.command_edit.text() != "":
         cmd.do(plugin.setting_tab_obj.command_edit.text())
 
     # Load reference structure
