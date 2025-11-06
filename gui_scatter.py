@@ -60,8 +60,13 @@ class ScatterTab:
         self.ax.clear()
         colors = assign_colors(self.plugin)
         self.scatter = self.ax.scatter(self.plugin.df[x], self.plugin.df[y], c=colors)
+
+        # colors
+        self.fc = self.scatter.get_facecolors()
+
         self.ax.set_xlabel(x)  # Axis labels
         self.ax.set_ylabel(y)
+        # self.ax.set_title(f"{len(self.plugin.selected_indices)} / {self.plugin.df.shape[0]}")
         self.canvas.draw()
         if self.lasso: self.lasso.disconnect_events()
         self.lasso = LassoSelector(self.ax, onselect=self.on_lasso_select)
@@ -73,3 +78,14 @@ class ScatterTab:
         path_obj = Path(verts)
         pts = np.column_stack((df[self.x_combo.currentText()], df[self.y_combo.currentText()]))
         self.plugin.selected_indices = np.nonzero(path_obj.contains_points(pts))[0]
+
+        # change alpha of selected / non selected points
+        self.fc[:, -1] = 0.2
+        self.fc[self.plugin.selected_indices, -1] = 1
+        self.scatter.set_facecolors(self.fc)
+
+        # update title
+        self.ax.set_title(f"{len(self.plugin.selected_indices)} / {self.plugin.df.shape[0]}")
+        self.canvas.draw()
+        
+        status_msg(f"{len(self.plugin.selected_indices)} / {self.plugin.df.shape[0]} designs selected")
