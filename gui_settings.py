@@ -66,7 +66,6 @@ class SettingTab:
             placeholderText="Command to run when loading structures",
             clearButtonEnabled=True
         )
-        # self.command_edit.textChanged.connect(self.set_load_command)
         form.addRow("Load Command:", self.command_edit)
         appearance_box.setLayout(form)
 
@@ -97,9 +96,6 @@ class SettingTab:
         self.plugin.reference_structure = ref_path
         self.ref_file_edit.setText(str(ref_path))
         status_msg("loaded reference structure")
-
-    # def set_load_command(self):
-    #     self.plugin.onloadCommand = self.command_edit.text()
 
     def set_replace_text(self):
         self.plugin.path_replace = (self.path_replace.text(), self.path_with.text())
