@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QFormLayout, QPushButton, QComboBox, QSpinBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.widgets import LassoSelector
@@ -50,19 +50,28 @@ class ScatterTab:
         self.x_max_slider.setValue(100)
         self.y_max_slider.setValue(100)
 
-        # construct layout
-        form.addRow("X-axis:", self.x_combo)
-        form.addRow("X Min:", self.x_min_slider)
-        form.addRow("X Max:", self.x_max_slider)
-        form.addRow("Y-axis:", self.y_combo)
-        form.addRow("Y Min:", self.y_min_slider)
-        form.addRow("Y Max:", self.y_max_slider)
-        form.addRow("Plot:", self.plot_btn)
-        form.addRow("Max models:", self.max_models_spin)
+        ## construct layout
+        # X-axis settings
+        self.x_hbox = QHBoxLayout()
+        for w in [QLabel("X-axis:"), self.x_combo, QLabel("min:"), self.x_min_slider, QLabel("max:"), self.x_max_slider]:
+            self.x_hbox.addWidget(w)
+        form.addRow(self.x_hbox)
+
+        # Y-axis settings
+        self.y_hbox = QHBoxLayout()
+        for w in [QLabel("Y-axis:"), self.y_combo, QLabel("min:"), self.y_min_slider, QLabel("max:"), self.y_max_slider]:
+            self.y_hbox.addWidget(w)
+        form.addRow(self.y_hbox)
+
+        form.addRow("Max models to load:", self.max_models_spin)
+        self.btn_hbox = QHBoxLayout()
+        self.btn_hbox.addWidget(self.plot_btn)
+        self.btn_hbox.addWidget(self.sync_btn)
+        form.addRow(self.btn_hbox)
         # TODO: classification
         #form.addRow("Mark Good:", self.classify_good_btn)
         #form.addRow("Mark Bad:", self.classify_bad_btn)
-        form.addRow("Sync with PyMOL:", self.sync_btn)
+        # form.addRow(self.sync_btn)
         control_box.setLayout(form)
         layout.addWidget(control_box)
 
