@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont
 import pandas as pd
 from .utils import status_msg
 
+#TODO: potentially dynamic window with button to add / remove filters
 
 class FilterTab:
     def __init__(self, plugin):
@@ -63,6 +64,11 @@ class Filter:
         self.score_combo = QComboBox()
         self.min_spin = QDoubleSpinBox()
         self.max_spin = QDoubleSpinBox()
+
+        for sb in [self.min_spin, self.max_spin]:
+            sb.setDecimals(3)
+            sb.setRange(-999, 999)
+            sb.setSingleStep(0.1)
 
         # Labels
         self.font = QFont()
