@@ -79,15 +79,23 @@ class SettingTab:
         df = pd.read_csv(csv_path)
         if "path" not in df.columns: return
         self.plugin.df = df
-        numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
-        not_numeric_cols = [c for c in df.columns if c not in numeric_cols]
-        self.plugin.scatter_tab_obj.x_combo.clear()
-        self.plugin.scatter_tab_obj.x_combo.addItems(numeric_cols)
-        self.plugin.scatter_tab_obj.y_combo.clear()
-        self.plugin.scatter_tab_obj.y_combo.addItems(numeric_cols)
+        self.plugin.og_df = df.copy()
+        self.plugin.numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
+        self.plugin.not_numeric_cols = [c for c in df.columns if c not in self.plugin.numeric_cols]
         self.path_combo.clear()
-        self.path_combo.addItems(not_numeric_cols)
+        self.path_combo.addItems(self.plugin.not_numeric_cols)
         self.csv_file_edit.setText(str(csv_path))
+
+        # updating scatter tab
+        self.plugin.scatter_tab_obj.x_combo.clear()
+        self.plugin.scatter_tab_obj.x_combo.addItems(self.plugin.numeric_cols)
+        self.plugin.scatter_tab_obj.y_combo.clear()
+        self.plugin.scatter_tab_obj.y_combo.addItems(self.plugin.numeric_cols)
+
+        # updating filter tab
+        for filter in self.plugin.all_filters:
+            filter.score_combo.addItems(self.plugin.numeric_cols)
+
         status_msg(f"Loaded {len(df)} models")
 
     def load_ref(self):
