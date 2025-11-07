@@ -125,4 +125,4 @@ class ScatterTab:
         self.ax.set_title(f"{len(self.plugin.selected_indices)} / {self.plugin.df.shape[0]}")
         self.canvas.draw()
         
-        status_msg(f"{len(self.plugin.selected_indices)} / {self.plugin.df.shape[0]} designs selected")
+        status_msg(f"{len(self.plugin.selected_indices)}/{self.plugin.df.shape[0]} designs selected")
