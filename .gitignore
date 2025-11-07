@@ -1,9 +1,2 @@
-__pycache__/__init__.cpython-310.pyc
-__pycache__/classification.cpython-310.pyc
-__pycache__/gui_heatmap.cpython-310.pyc
-__pycache__/gui_scatter.cpython-310.pyc
-__pycache__/main.cpython-310.pyc
-__pycache__/pymol_sync.cpython-310.pyc
-__pycache__/utils.cpython-310.pyc
-__pycache__/gui_settings.cpython-310.pyc
-__pycache__/gui_settings.cpython-310.pyc
+__pycache__/
+__pycache__/*

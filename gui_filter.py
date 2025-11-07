@@ -16,6 +16,9 @@ class FilterTab:
         # Filter 2
         filter_2 = Filter(2, self.plugin)
 
+        # Filter 3
+        filter_3 = Filter(3, self.plugin)
+
         # Filter Button
         self.filter_data_button = QPushButton("Filter Data")
         self.filter_data_button.clicked.connect(self.filter_data)
@@ -25,12 +28,14 @@ class FilterTab:
 
         layout.addWidget(filter_1.filter_box)
         layout.addWidget(filter_2.filter_box)
+        layout.addWidget(filter_3.filter_box)
         layout.addWidget(self.filter_data_button)
         layout.addWidget(self.all_filter_label)
 
         self.plugin.all_filters = [
             filter_1,
-            filter_2
+            filter_2,
+            filter_3
         ]
     
     def filter_data(self):
@@ -103,11 +108,15 @@ class Filter:
         self.max_value = self.max_spin.value()
 
         # get max and min values of score
-        data_min_value = self.plugin.df[self.score].min()
-        data_max_value = self.plugin.df[self.score].max()
-        self.min_label.setText(str(data_min_value))
-        self.max_label.setText(str(data_max_value))
-
+        try:
+            data_min_value = self.plugin.df[self.score].min()
+            data_max_value = self.plugin.df[self.score].max()
+            self.min_label.setText(str(data_min_value))
+            self.max_label.setText(str(data_max_value))
+        except TypeError as e:
+            status_msg("Filter Tab: No data available. Please load a csv file in settings tab first!")
+            return
+        
         # TODO needs bug fix
         # programatically setting the value blocks the spin box for the user
         # prevent box being stuck when updating value
