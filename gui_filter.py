@@ -51,7 +51,7 @@ class FilterTab:
                 mask &= self.plugin.og_df[f.score].between(f.min_value, f.max_value)
         
         self.plugin.df = self.plugin.og_df[mask]
-        self.all_filter_label.setText(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs")
+        self.all_filter_label.setText(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs pass all filters")
         status_msg(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs pass all filters")
 
 

@@ -27,6 +27,7 @@ class ScatterTab:
         self.max_models_spin = QSpinBox()
         self.max_models_spin.setRange(1,200)
         self.max_models_spin.setValue(10)
+        self.max_models_spin.setToolTip("Maximum number of models to load into PyMOL. Can be useful to prevent PyMOL\nfrom crashing. If the selected number of models exceeds the maximum\nspecified here, a random subset will be loaded.")
         self.color_classes = QCheckBox()
         self.color_classes.setToolTip("Colors data points according to classification (good: green, bad: red)")
         self.color_classes.setChecked(True)

@@ -23,12 +23,14 @@ class SettingTab:
             readOnly=True
         )
         self.path_combo = QComboBox()
+        self.path_combo.setToolTip("Column name in the csv specifying the path of the structures.\nPaths in this column will be used to load the models.")
 
         # replacing paths on load
         self.path_replace = QLineEdit(placeholderText='/remote/data', clearButtonEnabled=True)
         self.path_with = QLineEdit(placeholderText='/mount/data', clearButtonEnabled=True)
         self.path_replace.textChanged.connect(self.set_replace_text)
         self.path_with.textChanged.connect(self.set_replace_text)
+        self.path_replace.setToolTip("Replace sections of the path. This can be useful when storing\nmodels on a remote and mounting the remote file system to local.\nE.g. replace /home/user/designs with /mnt/cluster/designs")
 
         form.addRow("Load CSV:", self.load_btn)
         form.addRow("CSV File:", self.csv_file_edit)
@@ -80,6 +82,7 @@ class SettingTab:
 
     # TODO
     # Ensure that index is 0-indexed when loading df
+    # probably: df.reset_index(drop=True, inplace=True) - need testing
     def load_csv(self):
         csv_path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
         if not csv_path: return
