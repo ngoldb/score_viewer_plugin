@@ -1,16 +1,30 @@
 from pymol import cmd
 from .utils import status_msg
 import os
+import numpy as np
 
-def sync_with_pymol(plugin):
-    if plugin.df is None or len(plugin.selected_indices) == 0:
+
+def sync_with_pymol(plugin, selected_indices, exclude_classified):
+
+    if plugin.df is None:
+        status_msg("No data loaded - please load csv file first")
+        return 
+
+    if len(selected_indices) == 0:
         status_msg("No models selected for PyMOL sync.")
         return
+    
+    if exclude_classified:
+        classified = np.hstack([plugin.good_models, plugin.bad_models])
+        selected_indices = selected_indices[~np.isin(selected_indices, classified)]
+        if len(selected_indices) == 0:
+            status_msg("All selected models had alread been classified")
+            return
 
     # Access max_models_spin from scatter_tab object
     max_models = plugin.scatter_tab_obj.max_models_spin.value()
 
-    selected = plugin.df.iloc[plugin.selected_indices]
+    selected = plugin.df.iloc[selected_indices]
     if len(selected) > max_models:
         selected = selected.sample(max_models)  # Random selection
 

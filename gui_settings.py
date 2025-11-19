@@ -4,6 +4,9 @@ import pandas as pd
 from .utils import status_msg
 from pymol import cmd
 
+# TODO: add support for loading multiple pdb files from csv file 
+#       with support for grid mode display in PyMOL
+
 class SettingTab:
     def __init__(self, plugin):
         self.plugin = plugin
@@ -46,6 +49,7 @@ class SettingTab:
             readOnly=True
         )
         self.align_ref = QCheckBox()
+        self.align_ref.setToolTip("Align the loaded models to the loaded reference model")
         self.ref_color_combo = QComboBox()
         color_tuples = cmd.get_color_indices()
         color_names = [name for name, index in color_tuples]
@@ -66,6 +70,7 @@ class SettingTab:
             placeholderText="Command to run when loading structures",
             clearButtonEnabled=True
         )
+        self.command_edit.setToolTip("This command will be executed when loading structures.\nPyMOL syntax e.g. color skyblue; show sticks; util.cnc")
         form.addRow("Load Command:", self.command_edit)
         appearance_box.setLayout(form)
 
@@ -73,6 +78,8 @@ class SettingTab:
         layout.addWidget(reference_box)
         layout.addWidget(appearance_box)
 
+    # TODO
+    # Ensure that index is 0-indexed when loading df
     def load_csv(self):
         csv_path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
         if not csv_path: return

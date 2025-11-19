@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QCheckBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.widgets import LassoSelector
@@ -6,8 +6,8 @@ from matplotlib.path import Path
 import numpy as np
 import pandas as pd
 from .utils import status_msg, assign_colors
-from .classification import mark_good, mark_bad
 from .pymol_sync import sync_with_pymol
+
 
 class ScatterTab:
     def __init__(self, plugin):
@@ -22,16 +22,14 @@ class ScatterTab:
         self.y_combo = QComboBox()
         self.plot_btn = QPushButton("Plot")
         self.plot_btn.clicked.connect(self.plot_scores)
-        # TODO: classification
-        # self.classify_good_btn = QPushButton("Mark Good")
-        # self.classify_good_btn.clicked.connect(lambda: mark_good(self.plugin))
-        # self.classify_bad_btn = QPushButton("Mark Bad")
-        # self.classify_bad_btn.clicked.connect(lambda: mark_bad(self.plugin))
         self.sync_btn = QPushButton("Sync with PyMOL")
-        self.sync_btn.clicked.connect(lambda: sync_with_pymol(self.plugin))
+        self.sync_btn.clicked.connect(lambda: sync_with_pymol(self.plugin, self.plugin.selected_indices, self.plugin.classify_tab_obj.exclude_chk_box.isChecked()))
         self.max_models_spin = QSpinBox()
         self.max_models_spin.setRange(1,200)
         self.max_models_spin.setValue(10)
+        self.color_classes = QCheckBox()
+        self.color_classes.setToolTip("Colors data points according to classification (good: green, bad: red)")
+        self.color_classes.setChecked(True)
 
         # Min / Max sliders for Zoom
         self.x_min_slider = QSlider()
@@ -64,14 +62,11 @@ class ScatterTab:
         form.addRow(self.y_hbox)
 
         form.addRow("Max models to load:", self.max_models_spin)
+        form.addRow("Color classification:", self.color_classes)
         self.btn_hbox = QHBoxLayout()
         self.btn_hbox.addWidget(self.plot_btn)
         self.btn_hbox.addWidget(self.sync_btn)
         form.addRow(self.btn_hbox)
-        # TODO: classification
-        #form.addRow("Mark Good:", self.classify_good_btn)
-        #form.addRow("Mark Bad:", self.classify_bad_btn)
-        # form.addRow(self.sync_btn)
         control_box.setLayout(form)
         layout.addWidget(control_box)
 
@@ -84,10 +79,14 @@ class ScatterTab:
         self.lasso = None
 
     def plot_scores(self):
-        if self.plugin.df is None: return
+        if self.plugin.df is None: 
+            status_msg("no data loaded")
+            return
         x = self.x_combo.currentText()
         y = self.y_combo.currentText()
-        if x=="" or y=="": return
+        if x=="" or y=="": 
+            status_msg("no variables selected for plotting")
+            return
 
         x_data = self.plugin.df[x]
         y_data = self.plugin.df[y]
@@ -106,6 +105,11 @@ class ScatterTab:
 
         # colors
         self.fc = self.scatter.get_facecolors()
+        if len(self.plugin.selected_indices) != 0:
+            self.fc[:, -1] = 0.2
+            self.fc[self.plugin.selected_indices, -1] = 1
+            self.scatter.set_facecolors(self.fc)
+        # self.ax.scatter
 
         # axes
         self.ax.set_xlabel(x)  # Axis labels
