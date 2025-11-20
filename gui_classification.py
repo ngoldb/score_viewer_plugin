@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QGroupBox, QFormL
 import numpy as np
 
 from pymol import cmd
-from .classification import classify
+from .classification import classify, export_csv
 from .pymol_sync import sync_with_pymol
 from .utils import status_msg
 
@@ -62,11 +62,12 @@ class ClassificationTab:
         form = QFormLayout()
         self.export_fasta_button = QPushButton("Export to fasta")
         self.export_csv_button = QPushButton("Export to csv")
+        self.export_csv_button.clicked.connect(lambda: export_csv(self.plugin))
         form.addRow(self.export_fasta_button, self.export_csv_button)
         export_box.setLayout(form)
 
         # Layout
-        for box in [settings_box, classify_box]: # export_box
+        for box in [settings_box, classify_box, export_box]:
             layout.addWidget(box)
     
     
