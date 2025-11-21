@@ -87,7 +87,6 @@ class SettingTab:
         csv_path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
         if not csv_path: return
         df = pd.read_csv(csv_path)
-        if "path" not in df.columns: return
         self.plugin.df = df
         self.plugin.og_df = df.copy()
         self.plugin.numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
