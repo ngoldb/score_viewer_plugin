@@ -67,7 +67,7 @@ class Filter:
 
         for sb in [self.min_spin, self.max_spin]:
             sb.setDecimals(3)
-            sb.setRange(-999, 999)
+            sb.setRange(-9999, 9999)
             sb.setSingleStep(0.1)
 
         # Labels
