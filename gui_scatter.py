@@ -65,8 +65,13 @@ class ScatterTab:
             self.y_hbox.addWidget(w)
         form.addRow(self.y_hbox)
 
-        form.addRow("Max models to load:", self.max_models_spin)
-        form.addRow("Color classification:", self.color_classes)
+        plot_setting_box_1 = QHBoxLayout()
+        plot_setting_box_1.addWidget(QLabel("Max models to load:"))
+        plot_setting_box_1.addWidget(self.max_models_spin)
+        plot_setting_box_1.addStretch()
+        plot_setting_box_1.addWidget(QLabel("Color classification:"))
+        plot_setting_box_1.addWidget(self.color_classes)
+        form.addRow(plot_setting_box_1)
         self.btn_hbox = QHBoxLayout()
         self.btn_hbox.addWidget(self.plot_btn)
         self.btn_hbox.addWidget(self.sync_btn)
@@ -84,12 +89,12 @@ class ScatterTab:
 
     def plot_scores(self):
         if self.plugin.df is None: 
-            status_msg("no data loaded")
+            status_msg("no data loaded", color="yellow")
             return
         x = self.x_combo.currentText()
         y = self.y_combo.currentText()
         if x=="" or y=="": 
-            status_msg("no variables selected for plotting")
+            status_msg("no variables selected for plotting", color="yellow")
             return
 
         x_data = self.plugin.df[x]

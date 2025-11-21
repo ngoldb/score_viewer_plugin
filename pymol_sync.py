@@ -10,18 +10,18 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
     else: df = plugin.df
 
     if df is None:
-        status_msg("No data loaded - please load csv file first")
+        status_msg("No data loaded - please load csv file first", color="yellow")
         return 
 
     if len(selected_indices) == 0:
-        status_msg("No models selected for PyMOL sync.")
+        status_msg("No models selected for PyMOL sync.", color="yellow")
         return
     
     if exclude_classified:
         classified = np.hstack([plugin.good_models, plugin.bad_models])
         selected_indices = selected_indices[~np.isin(selected_indices, classified)]
         if len(selected_indices) == 0:
-            status_msg("All selected models had alread been classified")
+            status_msg("All selected models had alread been classified", color="yellow")
             return
 
     # Access max_models_spin from scatter_tab object
@@ -42,7 +42,7 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
             cmd.load(p)
             loaded += 1
         else:
-            status_msg(f"file not found: {p}")
+            status_msg(f"file not found: {p}", color="red")
 
     # Execute on-load command
     if plugin.setting_tab_obj.command_edit.text() != "":

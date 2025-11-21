@@ -43,7 +43,7 @@ class FilterTab:
         try:
             mask = pd.Series(True, index=self.plugin.og_df.index)
         except AttributeError as e:
-            status_msg("Filter Tab: No data available. Please load a csv file in settings tab first!")
+            status_msg("Filter Tab: No data available. Please load a csv file in settings tab first!", color="yellow")
             return
         
         for f in self.plugin.all_filters:
@@ -131,7 +131,7 @@ class Filter:
             self.min_label.setText(str(data_min_value))
             self.max_label.setText(str(data_max_value))
         except TypeError as e:
-            status_msg("Filter Tab: No data available. Please load a csv file in settings tab first!")
+            status_msg("Filter Tab: No data available. Please load a csv file in settings tab first!", color="yellow")
             return
         
         # TODO needs bug fix

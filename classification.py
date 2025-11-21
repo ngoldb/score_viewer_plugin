@@ -17,8 +17,8 @@ def classify(plugin, good: bool, enabled: bool):
         objects = [obj for obj in objects if obj in cmd.get_names("objects", enabled_only=1)]
 
     if len(objects) == 0: 
-        if enabled: status_msg("No objects enabled")
-        else: status_msg("No objects loaded")
+        if enabled: status_msg("No objects enabled", color="yellow")
+        else: status_msg("No objects loaded", color="yellow")
         return
 
     # find indices
@@ -129,7 +129,7 @@ def copy_models(plugin):
                     shutil.copy2(src_path, export_dir)
                     copied += 1
                 else:
-                    status_msg(f"failed to copy {src_path}")
+                    status_msg(f"failed to copy {src_path}", color="red")
             status_msg(f"copied {copied} models marked as {kind} to {export_dir}")
 
         else:
