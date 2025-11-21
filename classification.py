@@ -11,7 +11,6 @@ from .utils import status_msg
 
 # TODO
 # export fasta
-# export models (copy files)
 def classify(plugin, good: bool, enabled: bool):
     objects = cmd.get_object_list()
     if enabled:
@@ -23,6 +22,7 @@ def classify(plugin, good: bool, enabled: bool):
         return
 
     # find indices
+    objects = [f"{obj}." for obj in objects]
     selected = plugin.df.loc[
         plugin.df[plugin.setting_tab_obj.path_combo.currentText()].str.contains("|".join(objects))
     ].index
