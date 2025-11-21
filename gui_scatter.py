@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QCheckBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QCheckBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout, QDoubleSpinBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.widgets import LassoSelector
@@ -72,6 +72,29 @@ class ScatterTab:
         plot_setting_box_1.addWidget(QLabel("Color classification:"))
         plot_setting_box_1.addWidget(self.color_classes)
         form.addRow(plot_setting_box_1)
+
+        plot_setting_box_2 = QHBoxLayout()
+        self.alpha_spin = QDoubleSpinBox()
+        self.alpha_spin.setDecimals(2)
+        self.alpha_spin.setRange(0.2, 1)
+        self.alpha_spin.setSingleStep(0.1)
+        self.alpha_spin.setValue(1)
+        self.alpha_spin.valueChanged.connect(self.plot_scores)
+
+        self.marker_size_spin = QSpinBox()
+        self.marker_size_spin.setRange(0, 100)
+        self.marker_size_spin.setSingleStep(2)
+        self.marker_size_spin.setValue(14)
+        self.marker_size_spin.valueChanged.connect(self.plot_scores)
+
+        plot_setting_box_2.addWidget(QLabel("Scatter Alpha:"))
+        plot_setting_box_2.addWidget(self.alpha_spin)
+        plot_setting_box_2.addStretch()
+        plot_setting_box_2.addWidget(QLabel("Marker Size:"))
+        plot_setting_box_2.addWidget(self.marker_size_spin)
+
+        form.addRow(plot_setting_box_2)
+
         self.btn_hbox = QHBoxLayout()
         self.btn_hbox.addWidget(self.plot_btn)
         self.btn_hbox.addWidget(self.sync_btn)
@@ -110,14 +133,16 @@ class ScatterTab:
 
         self.ax.clear()
         colors = assign_colors(self.plugin)
-        self.scatter = self.ax.scatter(self.plugin.df[x], self.plugin.df[y], c=colors)
+        self.scatter = self.ax.scatter(self.plugin.df[x], self.plugin.df[y], c=colors, s=self.marker_size_spin.value())
 
         # colors
         self.fc = self.scatter.get_facecolors()
         if len(self.positional_selected) != 0:
-            self.fc[:, -1] = 0.2
-            self.fc[self.positional_selected, -1] = 1
-            self.scatter.set_facecolors(self.fc)
+            self.fc[:, -1] = 0.1
+            self.fc[self.positional_selected, -1] = self.alpha_spin.value()
+        else:
+            self.fc[:, -1] = self.alpha_spin.value()
+        self.scatter.set_facecolors(self.fc)
 
         # axes
         self.ax.set_xlabel(x)  # Axis labels
@@ -141,8 +166,11 @@ class ScatterTab:
         self.plugin.selected_indices = df.index[self.positional_selected]
 
         # change alpha of selected / non selected points
-        self.fc[:, -1] = 0.2
-        self.fc[self.positional_selected, -1] = 1
+        if len(self.positional_selected) != 0:
+            self.fc[:, -1] = 0.1
+            self.fc[self.positional_selected, -1] = self.alpha_spin.value()
+        else:
+            self.fc[:, -1] = self.alpha_spin.value()
         self.scatter.set_facecolors(self.fc)
 
         # update title
