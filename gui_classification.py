@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QGroupBox, QFormL
 import numpy as np
 
 from pymol import cmd
-from .classification import classify, export_csv
-from .pymol_sync import sync_with_pymol
+
 from .utils import status_msg
+from .pymol_sync import sync_with_pymol
+from .classification import classify, export_csv, copy_models
 
 # TODO
 # add export gui
@@ -62,8 +63,16 @@ class ClassificationTab:
         form = QFormLayout()
         self.export_fasta_button = QPushButton("Export to fasta")
         self.export_csv_button = QPushButton("Export to csv")
+        self.copy_button = QPushButton("Copy classified models")
+        self.copy_button.setToolTip("Copy models classified as good or bad to a directory")
+        self.export_csv_button.setToolTip("Export scores of good and bad models to csv files")
         self.export_csv_button.clicked.connect(lambda: export_csv(self.plugin))
-        form.addRow(self.export_fasta_button, self.export_csv_button)
+        self.copy_button.clicked.connect(lambda: copy_models(self.plugin))
+
+        button_box = QHBoxLayout()
+        for widget in [self.export_csv_button, self.copy_button]: # self.export_fasta_button
+            button_box.addWidget(widget)
+        form.addRow(button_box)
         export_box.setLayout(form)
 
         # Layout

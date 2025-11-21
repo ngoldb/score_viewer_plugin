@@ -1,13 +1,17 @@
 import os
+import shutil
+import numpy as np
+import pandas as pd
+from pymol import cmd
 from datetime import datetime
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
-import pandas as pd
-import numpy as np
+
 from .utils import status_msg
 
-from pymol import cmd
 
-
+# TODO
+# export fasta
+# export models (copy files)
 def classify(plugin, good: bool, enabled: bool):
     objects = cmd.get_object_list()
     if enabled:
@@ -59,11 +63,6 @@ def classify(plugin, good: bool, enabled: bool):
     plugin.scatter_tab_obj.plot_scores()
 
 
-# TODO
-# export fasta
-# export scores (csv)
-# export models (copy files)
-
 def export_csv(plugin):
     directory = QFileDialog.getExistingDirectory(
         None,
@@ -95,6 +94,49 @@ def export_csv(plugin):
 
     return 
 
+
+def copy_models(plugin):
+    directory = QFileDialog.getExistingDirectory(
+        None,
+        caption="Choose export directory",
+        directory=os.path.expanduser("~"), 
+        options=QFileDialog.ShowDirsOnly
+    )
+    export_manager = {
+        "good": [plugin.good_models],
+        "bad": [plugin.bad_models]
+    }
+    
+    for kind in export_manager:
+        models = export_manager[kind][0]
+        copied = 0
+        if len(models) > 0:
+
+            # create directory
+            export_dir = os.path.join(directory, f"{kind}_models")
+            if os.path.exists(export_dir):
+                timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
+                export_dir = os.path.join(directory, f"{kind}_models_{timestamp}")
+            os.makedirs(export_dir, exist_ok=True)
+
+            # iterate over selected models of respective group
+            selected_df = plugin.df.iloc[models]
+            for _, row in selected_df.iterrows():
+                src_path = row[plugin.setting_tab_obj.path_combo.currentText()]
+                if plugin.path_replace != None:
+                    src_path = src_path.replace(plugin.path_replace[0], plugin.path_replace[1])
+                if os.path.exists(src_path):
+                    shutil.copy2(src_path, export_dir)
+                    copied += 1
+                else:
+                    status_msg(f"failed to copy {src_path}")
+            status_msg(f"copied {copied} models marked as {kind} to {export_dir}")
+
+        else:
+            status_msg(f"no {kind} models to export")
+    return
+
+# TODO
 def export_models(plugin, kind="good"):
     data = set(plugin.df.iloc[plugin.selected_indices]["path"]) if len(plugin.selected_indices) > 0 else set()
     if not data:
