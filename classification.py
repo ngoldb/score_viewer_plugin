@@ -76,7 +76,7 @@ def export_csv(plugin):
         if os.path.exists(good_model_file):
             timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
             good_model_file = os.path.join(directory, f"good_models_{timestamp}.csv")
-        export_df = plugin.df.iloc[plugin.good_models].copy()
+        export_df = plugin.df.loc[plugin.good_models].copy()
         export_df.to_csv(good_model_file)
         status_msg(f"saved {len(export_df)} good models to {good_model_file}")
     else: status_msg("no good models to export")
@@ -87,7 +87,7 @@ def export_csv(plugin):
         if os.path.exists(bad_model_file):
             timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
             bad_model_file = os.path.join(directory, f"bad_models_{timestamp}.csv")
-        export_df = plugin.df.iloc[plugin.bad_models].copy()
+        export_df = plugin.df.loc[plugin.bad_models].copy()
         export_df.to_csv(bad_model_file)
         status_msg(f"saved {len(export_df)} bad models tp {bad_model_file}")
     else: status_msg("no bad models to export")
@@ -120,7 +120,7 @@ def copy_models(plugin):
             os.makedirs(export_dir, exist_ok=True)
 
             # iterate over selected models of respective group
-            selected_df = plugin.df.iloc[models]
+            selected_df = plugin.df.loc[models]
             for _, row in selected_df.iterrows():
                 src_path = row[plugin.setting_tab_obj.path_combo.currentText()]
                 if plugin.path_replace != None:
@@ -135,14 +135,3 @@ def copy_models(plugin):
         else:
             status_msg(f"no {kind} models to export")
     return
-
-# TODO
-def export_models(plugin, kind="good"):
-    data = set(plugin.df.iloc[plugin.selected_indices]["path"]) if len(plugin.selected_indices) > 0 else set()
-    if not data:
-        QMessageBox.information(None, "No Data", f"No {kind} models to export.")
-        return
-    path, _ = QFileDialog.getSaveFileName(None, f"Export {kind.capitalize()} Models", f"{kind}_models.csv", "CSV Files (*.csv)")
-    if not path: return
-    pd.DataFrame({"path": sorted(data)}).to_csv(path, index=False)
-    status_msg(f"Exported {len(data)} {kind} models to {path}")

@@ -7,8 +7,7 @@ from .utils import status_msg
 from .pymol_sync import sync_with_pymol
 from .classification import classify, export_csv, copy_models
 
-# TODO
-# add export gui
+
 class ClassificationTab:
     def __init__(self, plugin):
         self.plugin = plugin
@@ -23,9 +22,9 @@ class ClassificationTab:
         self.exclude_chk_box.setToolTip("Models which had already been classified will not be loaded again")
         self.exclude_chk_box.setChecked(True)
         self.show_good_button = QPushButton("Load Good")
-        self.show_good_button.clicked.connect(lambda: sync_with_pymol(self.plugin, self.plugin.good_models, False))
+        self.show_good_button.clicked.connect(lambda: sync_with_pymol(self.plugin, self.plugin.good_models, False, True))
         self.show_bad_button = QPushButton("Load Bad")
-        self.show_bad_button.clicked.connect(lambda: sync_with_pymol(self.plugin, self.plugin.bad_models, False))
+        self.show_bad_button.clicked.connect(lambda: sync_with_pymol(self.plugin, self.plugin.bad_models, False, True))
         self.restart_button = QPushButton("Restart")
         self.restart_button.clicked.connect(self.restart)
 

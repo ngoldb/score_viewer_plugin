@@ -4,9 +4,12 @@ import os
 import numpy as np
 
 
-def sync_with_pymol(plugin, selected_indices, exclude_classified):
+def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: bool=False):
 
-    if plugin.df is None:
+    if use_og_df: df = plugin.og_df
+    else: df = plugin.df
+
+    if df is None:
         status_msg("No data loaded - please load csv file first")
         return 
 
@@ -24,7 +27,7 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified):
     # Access max_models_spin from scatter_tab object
     max_models = plugin.scatter_tab_obj.max_models_spin.value()
 
-    selected = plugin.df.iloc[selected_indices]
+    selected = df.loc[selected_indices]
     if len(selected) > max_models:
         selected = selected.sample(max_models)  # Random selection
 

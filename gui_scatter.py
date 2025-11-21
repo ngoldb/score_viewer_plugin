@@ -9,9 +9,12 @@ from .utils import status_msg, assign_colors
 from .pymol_sync import sync_with_pymol
 
 
+# TODO
+# add user control for alpha, base color, marker size
 class ScatterTab:
     def __init__(self, plugin):
         self.plugin = plugin
+        self.positional_selected = []
         self.widget = QWidget()
         layout = QVBoxLayout(self.widget)
 
@@ -106,11 +109,10 @@ class ScatterTab:
 
         # colors
         self.fc = self.scatter.get_facecolors()
-        if len(self.plugin.selected_indices) != 0:
+        if len(self.positional_selected) != 0:
             self.fc[:, -1] = 0.2
-            self.fc[self.plugin.selected_indices, -1] = 1
+            self.fc[self.positional_selected, -1] = 1
             self.scatter.set_facecolors(self.fc)
-        # self.ax.scatter
 
         # axes
         self.ax.set_xlabel(x)  # Axis labels
@@ -128,11 +130,14 @@ class ScatterTab:
         df = self.plugin.df
         path_obj = Path(verts)
         pts = np.column_stack((df[self.x_combo.currentText()], df[self.y_combo.currentText()]))
-        self.plugin.selected_indices = np.nonzero(path_obj.contains_points(pts))[0]
+
+        # ensure selection on df index, not positional indexing of array!
+        self.positional_selected = np.nonzero(path_obj.contains_points(pts))[0]
+        self.plugin.selected_indices = df.index[self.positional_selected]
 
         # change alpha of selected / non selected points
         self.fc[:, -1] = 0.2
-        self.fc[self.plugin.selected_indices, -1] = 1
+        self.fc[self.positional_selected, -1] = 1
         self.scatter.set_facecolors(self.fc)
 
         # update title

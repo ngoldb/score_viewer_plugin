@@ -80,13 +80,12 @@ class SettingTab:
         layout.addWidget(reference_box)
         layout.addWidget(appearance_box)
 
-    # TODO
-    # Ensure that index is 0-indexed when loading df
-    # probably: df.reset_index(drop=True, inplace=True) - need testing
+
     def load_csv(self):
         csv_path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
         if not csv_path: return
         df = pd.read_csv(csv_path)
+        df.reset_index(drop=True, inplace=True)
         self.plugin.df = df
         self.plugin.og_df = df.copy()
         self.plugin.numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]

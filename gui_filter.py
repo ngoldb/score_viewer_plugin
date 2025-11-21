@@ -50,8 +50,19 @@ class FilterTab:
             if f.apply:
                 mask &= self.plugin.og_df[f.score].between(f.min_value, f.max_value)
         
+        # preserves original indexing of the df
         self.plugin.df = self.plugin.og_df[mask]
         self.all_filter_label.setText(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs pass all filters")
+
+        # call plotting function to update plot
+        try: 
+            self.plugin.scatter_tab_obj.plot_scores()
+        except IndexError as err:
+            # this is because privously selected data points are not in the filtered df anymore
+            # need to reset lasso selection
+            self.plugin.scatter_tab_obj.positional_selected = []
+            self.plugin.scatter_tab_obj.plot_scores()
+
         status_msg(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs pass all filters")
 
 
