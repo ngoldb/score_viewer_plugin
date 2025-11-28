@@ -160,6 +160,14 @@ class SettingTab:
         self.plugin.scatter_tab_obj.y_combo.clear()
         self.plugin.scatter_tab_obj.y_combo.addItems(self.plugin.numeric_cols)
 
+        # updating classification tab
+        self.plugin.classify_tab_obj.fasta_name_combo.clear()
+        self.plugin.classify_tab_obj.fasta_name_combo.addItems(self.plugin.not_numeric_cols)
+        self.plugin.classify_tab_obj.fasta_seq_combo.clear()
+        self.plugin.classify_tab_obj.fasta_seq_combo.addItems(self.plugin.not_numeric_cols)
+        self.plugin.classify_tab_obj.fasta_model.clear()
+        self.plugin.classify_tab_obj.fasta_model.addItems(self.plugin.not_numeric_cols)
+
         # updating filter tab
         for filter in self.plugin.all_filters:
             filter.score_combo.addItems(self.plugin.numeric_cols)

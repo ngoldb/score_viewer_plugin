@@ -11,6 +11,7 @@ from .utils import status_msg
 
 # TODO
 # export fasta
+
 def classify(plugin, good: bool, enabled: bool):
     objects = cmd.get_object_list()
     if enabled:
@@ -62,6 +63,10 @@ def classify(plugin, good: bool, enabled: bool):
     # call plot scores to update coloring
     plugin.scatter_tab_obj.plot_scores()
 
+    # update labels
+    plugin.classify_tab_obj.good_label.setText(f"{len(plugin.good_models)}/{len(plugin.og_df)} good models")
+    plugin.classify_tab_obj.bad_label.setText(f"{len(plugin.bad_models)}/{len(plugin.og_df)} bad models")
+
 
 def export_csv(plugin):
     directory = QFileDialog.getExistingDirectory(
@@ -76,7 +81,7 @@ def export_csv(plugin):
         if os.path.exists(good_model_file):
             timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
             good_model_file = os.path.join(directory, f"good_models_{timestamp}.csv")
-        export_df = plugin.df.loc[plugin.good_models].copy()
+        export_df = plugin.og_df.loc[plugin.good_models].copy()
         export_df.to_csv(good_model_file)
         status_msg(f"saved {len(export_df)} good models to {good_model_file}")
     else: status_msg("no good models to export")
@@ -120,7 +125,7 @@ def copy_models(plugin):
             os.makedirs(export_dir, exist_ok=True)
 
             # iterate over selected models of respective group
-            selected_df = plugin.df.loc[models]
+            selected_df = plugin.og_df.loc[models]
             for _, row in selected_df.iterrows():
                 src_path = row[plugin.setting_tab_obj.path_combo.currentText()]
                 if plugin.path_replace != None:
@@ -134,4 +139,23 @@ def copy_models(plugin):
 
         else:
             status_msg(f"no {kind} models to export")
+    return
+
+# TODO
+def export_fasta(plugin):
+    directory = QFileDialog.getExistingDirectory(
+        None,
+        caption="Choose export directory",
+        directory=os.path.expanduser("~"), 
+        options=QFileDialog.ShowDirsOnly
+    )
+    if plugin.classify_tab_obj.seq_from_models.isChecked():
+        raise NotImplementedError("exporting sequences from models is currently not implemented")
+    
+    name_col = plugin.classify_tab_obj.fasta_name_combo.currentText()
+    seq_col = plugin.classify_tab_obj.fasta_seq_combo.currentText()
+
+    names = plugin.og_df.loc[plugin.good_models].values
+    print(names)
+
     return

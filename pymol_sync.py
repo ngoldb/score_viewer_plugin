@@ -60,7 +60,8 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
     # Load reference structure
     ref_obj_name = None
     if plugin.reference_structure != None:
-        cmd.load(plugin.reference_structure)
+        ref_obj_name = os.path.basename(plugin.reference_structure).split(".")[0] + '_reference'
+        cmd.load(plugin.reference_structure, object=ref_obj_name)
         ref_obj_name = os.path.basename(plugin.reference_structure).split(".")[0]
         cmd.color(plugin.setting_tab_obj.ref_color_combo.currentText(), ref_obj_name)
 
@@ -69,7 +70,6 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
             cmd.set("grid_slot", 1, ref_obj_name)
         if plugin.setting_tab_obj.grid_mode_chkbox.isChecked() and plugin.setting_tab_obj.ref_in_all_chckbox.isChecked():
             cmd.set("grid_slot", -2, ref_obj_name)
-            print(f"display {ref_obj_name} in all slots")
 
     # loading selected models
     loaded = 0
@@ -81,7 +81,6 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
         if plugin.path_replace != None:
             paths = [p.replace(plugin.path_replace[0], plugin.path_replace[1]) for p in paths]
         
-        # bug fix: will create too many grid slots
         for i, p in enumerate(paths):
 
             if os.path.exists(p):
@@ -97,8 +96,6 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
                 if plugin.setting_tab_obj.align_ref.isChecked() and ref_obj_name != None:
                     try:
                         cmd.refresh()
-                        status_msg(f"aligning {object_name} to {ref_obj_name}", color="yellow")
-                        print(cmd.get_names("objects"))
                         cmd.align(object_name, ref_obj_name)
                     except pymol.CmdException as err:
                         status_msg(f"failed to align model {object_name} to {ref_obj_name}", color="red")
@@ -136,4 +133,6 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
             cmd.group(group, " ".join(groups[group]))
     
     cmd.center("all", animate=0)
+    cmd.do("util.cnc")
+    cmd.set("cartoon_side_chain_helper", 1)
     status_msg(f"Loaded {loaded} models into PyMOL")
