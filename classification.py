@@ -75,6 +75,8 @@ def export_csv(plugin):
         directory=os.path.expanduser("~"), 
         options=QFileDialog.ShowDirsOnly # QFileDialog.DontUseNativeDialog
     )
+    if not directory: return
+    
     # save good models
     if len(plugin.good_models) > 0:
         good_model_file = os.path.join(directory, "good_models.csv")
@@ -107,6 +109,8 @@ def copy_models(plugin):
         directory=os.path.expanduser("~"), 
         options=QFileDialog.ShowDirsOnly
     )
+    if not directory: return
+    
     export_manager = {
         "good": [plugin.good_models],
         "bad": [plugin.bad_models]
@@ -149,13 +153,47 @@ def export_fasta(plugin):
         directory=os.path.expanduser("~"), 
         options=QFileDialog.ShowDirsOnly
     )
+    if not directory: return
     if plugin.classify_tab_obj.seq_from_models.isChecked():
         raise NotImplementedError("exporting sequences from models is currently not implemented")
     
     name_col = plugin.classify_tab_obj.fasta_name_combo.currentText()
     seq_col = plugin.classify_tab_obj.fasta_seq_combo.currentText()
 
-    names = plugin.og_df.loc[plugin.good_models].values
+    # save good model fasta
+    names = plugin.og_df.loc[plugin.good_models][name_col].values
+    seqs = plugin.og_df.loc[plugin.good_models][seq_col].values
     print(names)
+
+    if len(plugin.good_models) > 0:
+        good_model_file = os.path.join(directory, "good_models.fasta")
+        if os.path.exists(good_model_file):
+            timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
+            good_model_file = os.path.join(directory, f"good_models_{timestamp}.fasta")
+    
+        with open(good_model_file, "w") as fobj:
+            for name, seq in zip(names, seqs):
+                fobj.writelines(f">{name}\n{seq}\n")
+    
+    else:
+        status_msg("no good models to export")
+
+    # save bad model fasta 
+    names = plugin.og_df.loc[plugin.good_models][name_col].values
+    seqs = plugin.og_df.loc[plugin.good_models][seq_col].values
+
+    if len(plugin.bad_models) > 0:
+        bad_model_file = os.path.join(directory, "bad_models.fasta")
+        if os.path.exists(bad_model_file):
+            timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
+            bad_model_file = os.path.join(directory, f"bad_models_{timestamp}.fasta")
+        
+        with open(bad_model_file, "w") as fobj:
+            for name, seq in zip(names, seqs):
+                fobj.writelines(f">{name}\n{seq}\n")
+        
+    else:
+        status_msg("no bad models to export")
+    
 
     return
