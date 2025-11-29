@@ -3,7 +3,6 @@ from PyQt5.QtGui import QFont
 import pandas as pd
 from .utils import status_msg
 
-#TODO: potentially dynamic window with button to add / remove filters
 
 class FilterTab:
     def __init__(self, plugin):
@@ -58,7 +57,7 @@ class FilterTab:
         try: 
             self.plugin.scatter_tab_obj.plot_scores()
         except IndexError as err:
-            # this is because privously selected data points are not in the filtered df anymore
+            # this is because previously selected data points are not in the filtered df anymore
             # need to reset lasso selection
             self.plugin.scatter_tab_obj.positional_selected = []
             self.plugin.scatter_tab_obj.plot_scores()
@@ -126,23 +125,13 @@ class Filter:
 
         # get max and min values of score
         try:
-            data_min_value = self.plugin.df[self.score].min()
-            data_max_value = self.plugin.df[self.score].max()
+            data_min_value = self.plugin.og_df[self.score].min()
+            data_max_value = self.plugin.og_df[self.score].max()
             self.min_label.setText(str(data_min_value))
             self.max_label.setText(str(data_max_value))
         except TypeError as e:
             status_msg("Filter Tab: No data available. Please load a csv file in settings tab first!", color="yellow")
             return
-        
-        # TODO needs bug fix
-        # programatically setting the value blocks the spin box for the user
-        # prevent box being stuck when updating value
-        # self.min_spin.blockSignals(True)
-        # self.max_spin.blockSignals(True)
-        # self.min_spin.setValue(data_min_value)
-        # self.max_spin.setValue(data_max_value)
-        # self.min_spin.blockSignals(False)
-        # self.max_spin.blockSignals(False)
 
         if self.apply:
             all_models = self.plugin.og_df.shape[0]
