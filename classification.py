@@ -9,9 +9,6 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from .utils import status_msg
 
 
-# TODO
-# export fasta
-
 def classify(plugin, good: bool, enabled: bool):
     objects = cmd.get_object_list()
     if enabled:
@@ -23,7 +20,7 @@ def classify(plugin, good: bool, enabled: bool):
         return
 
     # find indices
-    objects = [f"{obj}." for obj in objects]
+    objects = [f"{obj}." for obj in objects if obj != plugin.ref_obj_name]
     selected = plugin.df.loc[
         plugin.df[plugin.setting_tab_obj.path_combo.currentText()].str.contains("|".join(objects))
     ].index
@@ -145,7 +142,7 @@ def copy_models(plugin):
             status_msg(f"no {kind} models to export")
     return
 
-# TODO
+# TODO: sequence from objects
 def export_fasta(plugin):
     directory = QFileDialog.getExistingDirectory(
         None,

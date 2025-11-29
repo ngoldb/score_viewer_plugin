@@ -58,18 +58,19 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
         cmd.set("grid_mode", 0)
 
     # Load reference structure
-    ref_obj_name = None
+    plugin.ref_obj_name = None
     if plugin.reference_structure != None:
-        ref_obj_name = os.path.basename(plugin.reference_structure).split(".")[0] + '_reference'
-        cmd.load(plugin.reference_structure, object=ref_obj_name)
-        ref_obj_name = os.path.basename(plugin.reference_structure).split(".")[0]
-        cmd.color(plugin.setting_tab_obj.ref_color_combo.currentText(), ref_obj_name)
+        if os.path.exists(plugin.reference_structure):
+            plugin.ref_obj_name = os.path.basename(plugin.reference_structure).split(".")[0] + '_reference'
+            cmd.load(plugin.reference_structure, object=plugin.ref_obj_name)
 
-        # Display reference in first grid slot by default
-        if plugin.setting_tab_obj.grid_mode_chkbox.isChecked():
-            cmd.set("grid_slot", 1, ref_obj_name)
-        if plugin.setting_tab_obj.grid_mode_chkbox.isChecked() and plugin.setting_tab_obj.ref_in_all_chckbox.isChecked():
-            cmd.set("grid_slot", -2, ref_obj_name)
+            # Display reference in first grid slot by default
+            if plugin.setting_tab_obj.grid_mode_chkbox.isChecked():
+                cmd.set("grid_slot", 1, plugin.ref_obj_name)
+            if plugin.setting_tab_obj.grid_mode_chkbox.isChecked() and plugin.setting_tab_obj.ref_in_all_chckbox.isChecked():
+                cmd.set("grid_slot", -2, plugin.ref_obj_name)
+        else:
+            status_msg(f"Reference structure file not found: {plugin.reference_structure}", color="red")
 
     # loading selected models
     loaded = 0
@@ -93,12 +94,12 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
                 loaded += 1
 
                 # align model to reference
-                if plugin.setting_tab_obj.align_ref.isChecked() and ref_obj_name != None:
+                if plugin.setting_tab_obj.align_ref.isChecked() and plugin.ref_obj_name != None:
                     try:
                         cmd.refresh()
-                        cmd.align(object_name, ref_obj_name)
+                        cmd.align(object_name, plugin.ref_obj_name)
                     except pymol.CmdException as err:
-                        status_msg(f"failed to align model {object_name} to {ref_obj_name}", color="red")
+                        status_msg(f"failed to align model {object_name} to {plugin.ref_obj_name}", color="red")
                 
                 # Set grid slots
                 if plugin.setting_tab_obj.grid_mode_chkbox.isChecked():
@@ -109,12 +110,10 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
                     if i == 0:
                         # init group here
                         groupname = object_name + "_group"
-                        groups[groupname] = [object_name]
-                        # cmd.group(groupname, object_name)
+                        cmd.group(groupname, object_name)
                     else:
                         # add other models here
-                        groups[groupname].append(object_name)
-                        # cmd.group(groupname, object_name)
+                        cmd.group(groupname, object_name)
 
             else:
                 status_msg(f"file not found: {p}", color="red")
@@ -124,13 +123,8 @@ def sync_with_pymol(plugin, selected_indices, exclude_classified, use_og_df: boo
         cmd.do(plugin.setting_tab_obj.command_edit.text())
 
     # color reference object
-    if ref_obj_name != None:
-        cmd.color(plugin.setting_tab_obj.ref_color_combo.currentText(), ref_obj_name)
-    
-    # create groups - seems more robust after alignment
-    if plugin.setting_tab_obj.group_models_chkbox.isChecked() and len(paths) > 1:
-        for group in groups:
-            cmd.group(group, " ".join(groups[group]))
+    if plugin.ref_obj_name != None:
+        cmd.color(plugin.setting_tab_obj.ref_color_combo.currentText(), plugin.ref_obj_name)
     
     cmd.center("all", animate=0)
     cmd.do("util.cnc")
