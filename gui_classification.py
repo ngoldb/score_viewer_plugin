@@ -96,9 +96,16 @@ class ClassificationTab:
         
         # Fasta Export
         self.fasta_name_combo = QComboBox()
+        self.fasta_name_combo.setToolTip("The name of the column in the csv containing the names")
         self.fasta_seq_combo = QComboBox()
+        self.fasta_seq_combo.setToolTip("The name of the column in the csv containing the sequences")
         self.seq_from_models = QCheckBox()
+        self.seq_from_models.setToolTip("Load models into PyMOL and get sequences from models")
         self.fasta_model = QComboBox()
+        self.fasta_model.setToolTip("Which model to load to derive the sequence from")
+        self.fasta_chain = QComboBox()
+        self.fasta_chain.setToolTip("The chain identifier")
+        self.fasta_chain.addItems(['all', "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"])
         self.export_fasta_button = QPushButton("Export to fasta")
         self.export_fasta_button.clicked.connect(lambda: export_fasta(self.plugin))
 
@@ -111,11 +118,14 @@ class ClassificationTab:
 
         fasta_box_2 = QHBoxLayout()
         fasta_box_2.addWidget(self.seq_from_models)
-        fasta_box_2.addWidget(QLabel("Sequence from models"))
+        fasta_box_2.addWidget(QLabel("  Sequence from models"))
         fasta_box_2.addWidget(self.fasta_model)
+        fasta_box_2.addWidget(QLabel("Chain"))
+        fasta_box_2.addWidget(self.fasta_chain)
         fasta_box_2.addStretch()
 
         form.addRow(button_box)
+        form.addRow(QLabel("")) # vertical space
         form.addRow(QLabel("Fasta Export:"))
         form.addRow(fasta_box_1)
         form.addRow(fasta_box_2)

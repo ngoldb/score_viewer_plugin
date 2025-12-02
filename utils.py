@@ -6,7 +6,8 @@ def status_msg(msg, color="default"):
         "magenta": "\033[35m",
         "yellow": "\033[33m",
         "cyan": "\033[36m",
-        "blue": "\033[34m"
+        "blue": "\033[34m",
+        "green": "\033[32m"
     }
     reset = "\033[0m"
     

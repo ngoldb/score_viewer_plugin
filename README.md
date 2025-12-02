@@ -14,7 +14,7 @@ Download the code as archive (.zip) from GitHub to your computer (Code > Downloa
 
 #### Download Code through PyMOL's Plugin Manager
 Alternatively, navigate to Plugin > Plugin Manager > Install New Plugin. Copy the url to the GitHub repo
-```console
+```
 https://github.com/ngoldb/score_viewer_plugin
 ```
 into the URL field and click "Fetch". Select the default directory suggested by the Plugin Manager.
@@ -25,7 +25,7 @@ Check here for more information about plugins in PyMOL: https://pymolwiki.org/in
 Navigate to the PyMOL plugin directory and clone the GitHub repo.
 
 For MacOS:
-```console
+```
 cd /Applications/PyMOL.app/Contents/lib/python3.10/site-packages/pmg_tk/startup
 git clone https://github.com/ngoldb/score_viewer_plugin.git
 ```

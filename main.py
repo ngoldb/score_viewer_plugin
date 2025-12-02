@@ -6,6 +6,8 @@ from .gui_settings import SettingTab
 from .gui_filter import FilterTab
 from .gui_classification import ClassificationTab
 
+# TODO
+# save score_viewer session to resume?
 class ScoreViewerPlugin(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -15,6 +17,7 @@ class ScoreViewerPlugin(QDialog):
         # Helper variables
         self.path_replace = None
         self.reference_structure = None
+        self.ref_obj_name = None
 
         # Data containers
         self.df = None
