@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QGroupBox, QFormLayout, QCheckBox, QHBoxLayout, QLabel, QComboBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QGroupBox, QFormLayout, QCheckBox, QHBoxLayout, QLabel, QComboBox, QListWidget
 from PyQt5.QtGui import QFont
 import numpy as np
 
@@ -13,13 +13,6 @@ from .classification import classify, export_csv, copy_models, export_fasta
 #  - list with model names of good and bad models
 #  - if clicked --> model should be shown in PyMOL
 
-# TINDER
-#  - Tinder mode with "wiping" left/right to classify models
-
-# EXPORT
-#  - fasta export: export sequences from chosen column
-#  - export all: convenience function to export csv, models, fasta
-
 class ClassificationTab:
     def __init__(self, plugin):
         self.plugin = plugin
@@ -27,7 +20,7 @@ class ClassificationTab:
         self.widget = QWidget()
         layout = QVBoxLayout(self.widget)
 
-        # Settings Box
+        ## Settings Box
         settings_box = QGroupBox("")
         form = QFormLayout()
         self.exclude_chk_box = QCheckBox()
@@ -40,14 +33,31 @@ class ClassificationTab:
         self.restart_button = QPushButton("Restart")
         self.restart_button.clicked.connect(self.restart)
 
+        # Lists of classified models
+        list_box = QHBoxLayout()
+        left_column = QVBoxLayout()
+        left_column.addWidget(QLabel("Bad models"))
+        self.bad_models_list = QListWidget()
+        left_column.addWidget(self.bad_models_list)
+
+        right_column = QVBoxLayout()
+        right_column.addWidget(QLabel("Good models"))
+        self.good_models_list = QListWidget()
+        right_column.addWidget(self.good_models_list)
+
+        list_box.addLayout(left_column)
+        list_box.addLayout(right_column)
+
+        # Construct Layout
         self.button_box = QHBoxLayout()
         for b in [self.show_good_button, self.show_bad_button, self.restart_button]:
             self.button_box.addWidget(b)
+        form.addRow(list_box)
         form.addRow("Exclude already classified:", self.exclude_chk_box)
         form.addRow(self.button_box)
         settings_box.setLayout(form)
         
-        # Classification
+        ## Classification Box
         classify_box = QGroupBox("Classify")
         form = QFormLayout()
         all_box = QHBoxLayout()
@@ -80,7 +90,7 @@ class ClassificationTab:
         form.addRow(info_box)
         classify_box.setLayout(form)
 
-        # Export Box
+        ## Export Box
         export_box = QGroupBox("Export")
         form = QFormLayout()
         self.export_csv_button = QPushButton("Export to csv")
@@ -105,7 +115,7 @@ class ClassificationTab:
         self.fasta_model.setToolTip("Which model to load to derive the sequence from")
         self.fasta_chain = QComboBox()
         self.fasta_chain.setToolTip("The chain identifier")
-        self.fasta_chain.addItems(['all', "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"])
+        self.fasta_chain.addItems(['all', "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"])
         self.export_fasta_button = QPushButton("Export to fasta")
         self.export_fasta_button.clicked.connect(lambda: export_fasta(self.plugin))
 
