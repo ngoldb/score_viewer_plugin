@@ -3,6 +3,7 @@ import numpy as np
 from .gui_scatter import ScatterTab
 from .gui_settings import SettingTab
 from .gui_filter import FilterTab
+from .gui_tinder import TinderTab
 from .gui_classification import ClassificationTab
 
 # TODO
@@ -25,6 +26,7 @@ class ScoreViewerPlugin(QDialog):
         self.all_filters = []
         self.good_models = np.array([], dtype=int)
         self.bad_models = np.array([], dtype=int)
+        self.tinder_state = False
 
         # Tabs
         layout = QVBoxLayout(self)
@@ -36,8 +38,10 @@ class ScoreViewerPlugin(QDialog):
         self.setting_tab_obj = SettingTab(self)
         self.filter_tab_obj = FilterTab(self)
         self.classify_tab_obj = ClassificationTab(self)
-
+        self.tinder_tab_obj = TinderTab(self)
+        
         self.tabs.addTab(self.setting_tab_obj.widget, "Settings")
         self.tabs.addTab(self.filter_tab_obj.widget, "Filter")
         self.tabs.addTab(self.scatter_tab_obj.widget, "Scatter Plot")
         self.tabs.addTab(self.classify_tab_obj.widget, "Classification")
+        self.tabs.addTab(self.tinder_tab_obj.widget, "Tinder")
