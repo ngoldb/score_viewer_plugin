@@ -4,12 +4,14 @@ import numpy as np
 import pandas as pd
 from pymol import cmd
 from datetime import datetime
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QListWidgetItem
+from PyQt5.QtCore import Qt
 
 from .utils import status_msg
 
 
 def classify(plugin, good: bool, enabled: bool):
+    DESIGN_INDEX = Qt.UserRole
     objects = cmd.get_object_list()
     if enabled:
         objects = [obj for obj in objects if obj in cmd.get_names("objects", enabled_only=1)]
@@ -59,6 +61,24 @@ def classify(plugin, good: bool, enabled: bool):
 
     # call plot scores to update coloring
     plugin.scatter_tab_obj.plot_scores()
+
+    # TODO
+    # update model lists
+    plugin.classify_tab_obj.good_models_list.clear()
+    plugin.classify_tab_obj.bad_models_list.clear()
+
+    path_column = plugin.setting_tab_obj.path_combo.currentText()
+    for model in plugin.good_models:
+        model_name = os.path.basename(plugin.og_df.loc[model][path_column])
+        item = QListWidgetItem(model_name)
+        item.setData(DESIGN_INDEX, model)
+        plugin.classify_tab_obj.good_models_list.addItem(item)
+
+    for model in plugin.bad_models:
+        model_name = os.path.basename(plugin.og_df.loc[model][path_column])
+        item = QListWidgetItem(model_name)
+        item.setData(DESIGN_INDEX, model)
+        plugin.classify_tab_obj.bad_models_list.addItem(item)
 
     # update labels
     plugin.classify_tab_obj.good_label.setText(f"{len(plugin.good_models)}/{len(plugin.og_df)} good models")

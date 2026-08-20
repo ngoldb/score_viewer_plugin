@@ -153,4 +153,6 @@ class ClassificationTab:
         self.plugin.scatter_tab_obj.plot_scores()
         self.good_label.setText(f"{len(self.plugin.good_models)}/{len(self.plugin.og_df)} good models")
         self.bad_label.setText(f"{len(self.plugin.bad_models)}/{len(self.plugin.og_df)} bad models")
+        self.good_models_list.clear()
+        self.bad_models_list.clear()
         status_msg("restarted calssification")
