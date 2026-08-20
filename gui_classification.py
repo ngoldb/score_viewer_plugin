@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QGroupBox, QFormLayout, QCheckBox, QHBoxLayout, QLabel, QComboBox, QListWidget
 from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 import numpy as np
 
 from pymol import cmd
@@ -14,6 +15,9 @@ from .classification import classify, export_csv, copy_models, export_fasta
 #  - if clicked --> model should be shown in PyMOL
 
 class ClassificationTab:
+
+    MODEL_INDEX = Qt.UserRole
+
     def __init__(self, plugin):
         self.plugin = plugin
 
@@ -39,11 +43,13 @@ class ClassificationTab:
         left_column.addWidget(QLabel("Bad models"))
         self.bad_models_list = QListWidget()
         left_column.addWidget(self.bad_models_list)
+        self.bad_models_list.itemClicked.connect(self.item_clicked)
 
         right_column = QVBoxLayout()
         right_column.addWidget(QLabel("Good models"))
         self.good_models_list = QListWidget()
         right_column.addWidget(self.good_models_list)
+        self.good_models_list.itemClicked.connect(self.item_clicked)
 
         list_box.addLayout(left_column)
         list_box.addLayout(right_column)
@@ -156,3 +162,9 @@ class ClassificationTab:
         self.good_models_list.clear()
         self.bad_models_list.clear()
         status_msg("restarted calssification")
+
+
+    def item_clicked(self, item):
+        index = item.data(self.MODEL_INDEX)
+        print(item.text(), index)
+        sync_with_pymol(self.plugin, [index], False, True)        

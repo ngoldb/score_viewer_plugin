@@ -11,7 +11,7 @@ from .utils import status_msg
 
 
 def classify(plugin, good: bool, enabled: bool):
-    DESIGN_INDEX = Qt.UserRole
+
     objects = cmd.get_object_list()
     if enabled:
         objects = [obj for obj in objects if obj in cmd.get_names("objects", enabled_only=1)]
@@ -62,8 +62,16 @@ def classify(plugin, good: bool, enabled: bool):
     # call plot scores to update coloring
     plugin.scatter_tab_obj.plot_scores()
 
-    # TODO
     # update model lists
+    update_model_lists(plugin)
+
+    # update labels
+    plugin.classify_tab_obj.good_label.setText(f"{len(plugin.good_models)}/{len(plugin.og_df)} good models")
+    plugin.classify_tab_obj.bad_label.setText(f"{len(plugin.bad_models)}/{len(plugin.og_df)} bad models")
+
+
+def update_model_lists(plugin):
+    MODEL_INDEX = Qt.UserRole
     plugin.classify_tab_obj.good_models_list.clear()
     plugin.classify_tab_obj.bad_models_list.clear()
 
@@ -71,18 +79,14 @@ def classify(plugin, good: bool, enabled: bool):
     for model in plugin.good_models:
         model_name = os.path.basename(plugin.og_df.loc[model][path_column])
         item = QListWidgetItem(model_name)
-        item.setData(DESIGN_INDEX, model)
+        item.setData(MODEL_INDEX, model)
         plugin.classify_tab_obj.good_models_list.addItem(item)
 
     for model in plugin.bad_models:
         model_name = os.path.basename(plugin.og_df.loc[model][path_column])
         item = QListWidgetItem(model_name)
-        item.setData(DESIGN_INDEX, model)
+        item.setData(MODEL_INDEX, model)
         plugin.classify_tab_obj.bad_models_list.addItem(item)
-
-    # update labels
-    plugin.classify_tab_obj.good_label.setText(f"{len(plugin.good_models)}/{len(plugin.og_df)} good models")
-    plugin.classify_tab_obj.bad_label.setText(f"{len(plugin.bad_models)}/{len(plugin.og_df)} bad models")
 
 
 def export_csv(plugin):
@@ -162,7 +166,7 @@ def copy_models(plugin):
             status_msg(f"no {kind} models to export", color="yellow")
     return
 
-# TODO: sequence from objects
+
 def export_fasta(plugin):
     directory = QFileDialog.getExistingDirectory(
         None,
