@@ -1,16 +1,17 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QCheckBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout, QDoubleSpinBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSlider, QGroupBox, QCheckBox, QFormLayout, QLabel, QPushButton, QComboBox, QSpinBox, QHBoxLayout, QDoubleSpinBox, QListWidgetItem
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.widgets import LassoSelector
 from matplotlib.path import Path
+import os
 import numpy as np
 import pandas as pd
 from .utils import status_msg, assign_colors
 from .pymol_sync import sync_with_pymol
 
 
-# TODO
-# add user control for alpha, base color, marker size
+
 class ScatterTab:
     def __init__(self, plugin):
         self.plugin = plugin
@@ -26,6 +27,8 @@ class ScatterTab:
         self.plot_btn = QPushButton("Plot")
         self.plot_btn.clicked.connect(self.plot_scores)
         self.sync_btn = QPushButton("Sync with PyMOL")
+        self.tinder_btn = QPushButton("Add to tinder")
+        self.tinder_btn.clicked.connect(self.add2tinder)
         self.sync_btn.clicked.connect(lambda: sync_with_pymol(self.plugin, self.plugin.selected_indices, self.plugin.classify_tab_obj.exclude_chk_box.isChecked()))
         self.max_models_spin = QSpinBox()
         self.max_models_spin.setRange(1,200)
@@ -98,6 +101,7 @@ class ScatterTab:
         self.btn_hbox = QHBoxLayout()
         self.btn_hbox.addWidget(self.plot_btn)
         self.btn_hbox.addWidget(self.sync_btn)
+        self.btn_hbox.addWidget(self.tinder_btn)
         form.addRow(self.btn_hbox)
         control_box.setLayout(form)
         layout.addWidget(control_box)
@@ -178,3 +182,19 @@ class ScatterTab:
         self.canvas.draw()
         
         status_msg(f"{len(self.plugin.selected_indices)}/{self.plugin.df.shape[0]} designs selected")
+
+    def add2tinder(self):
+        if len(self.plugin.selected_indices) == 0:
+            status_msg("No designs selected. Use the lasso tool to select designs first!", color="yellow")
+
+        else:
+            # get the first path variable from settings tab
+            path_column = self.plugin.setting_tab_obj.path_combo.currentText()
+
+            # add all selected models to the pending list in tinder
+            for selected_index in self.plugin.selected_indices:
+                object_name = os.path.basename(self.plugin.og_df.loc[selected_index][path_column])
+                print(object_name, selected_index)
+                self.plugin.tinder_tab_obj.add_pending_model(object_name, selected_index)
+
+            status_msg(f"{len(self.plugin.selected_indices)} designs added to Tinder selection")
