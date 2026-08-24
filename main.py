@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QShortcut
 import numpy as np
 from .gui_scatter import ScatterTab
 from .gui_settings import SettingTab
@@ -45,3 +47,25 @@ class ScoreViewerPlugin(QDialog):
         self.tabs.addTab(self.scatter_tab_obj.widget, "Scatter Plot")
         self.tabs.addTab(self.classify_tab_obj.widget, "Classification")
         self.tabs.addTab(self.tinder_tab_obj.widget, "Tinder")
+
+        # Tinder Shortcuts
+        self.left_shortcut = QShortcut(
+            QKeySequence(Qt.Key_Left),
+            self
+        )
+        self.right_shortcut = QShortcut(
+            QKeySequence(Qt.Key_Right),
+            self
+        )
+
+        # currently only works in the score viewer window and only
+        # if not in Settings tab
+        self.left_shortcut.setContext(Qt.ApplicationShortcut)
+        self.right_shortcut.setContext(Qt.ApplicationShortcut)
+        self.left_shortcut.setEnabled(False)
+        self.right_shortcut.setEnabled(False)
+
+        # left arrow key: reject model, right arrow key: accept model
+        self.left_shortcut.activated.connect(lambda: self.tinder_tab_obj.cycle_model(good=False))
+        self.right_shortcut.activated.connect(lambda: self.tinder_tab_obj.cycle_model(good=True))
+

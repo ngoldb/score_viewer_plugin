@@ -166,5 +166,4 @@ class ClassificationTab:
 
     def item_clicked(self, item):
         index = item.data(self.MODEL_INDEX)
-        print(item.text(), index)
         sync_with_pymol(self.plugin, [index], False, True)        

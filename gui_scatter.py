@@ -13,6 +13,9 @@ from .pymol_sync import sync_with_pymol
 
 
 class ScatterTab:
+
+    MODEL_INDEX = Qt.UserRole
+
     def __init__(self, plugin):
         self.plugin = plugin
         self.positional_selected = []
@@ -183,7 +186,10 @@ class ScatterTab:
         
         status_msg(f"{len(self.plugin.selected_indices)}/{self.plugin.df.shape[0]} designs selected")
 
+
     def add2tinder(self):
+        '''adds the selected models to tinder tab pending list'''
+        
         if len(self.plugin.selected_indices) == 0:
             status_msg("No designs selected. Use the lasso tool to select designs first!", color="yellow")
 
@@ -191,10 +197,24 @@ class ScatterTab:
             # get the first path variable from settings tab
             path_column = self.plugin.setting_tab_obj.path_combo.currentText()
 
-            # add all selected models to the pending list in tinder
-            for selected_index in self.plugin.selected_indices:
-                object_name = os.path.basename(self.plugin.og_df.loc[selected_index][path_column])
-                print(object_name, selected_index)
-                self.plugin.tinder_tab_obj.add_pending_model(object_name, selected_index)
+            # get items currently in pending and completed lists
+            all_pending = []
+            all_completed = []
+            for i in range(self.plugin.tinder_tab_obj.pending_list.count()):
+                item = self.plugin.tinder_tab_obj.pending_list.item(i)
+                all_pending.append(item.data(self.MODEL_INDEX))
+            for i in range(self.plugin.tinder_tab_obj.completed_list.count()):
+                item = self.plugin.tinder_tab_obj.completed_list.item(i)
+                all_completed.append(item.data(self.MODEL_INDEX))
 
-            status_msg(f"{len(self.plugin.selected_indices)} designs added to Tinder selection")
+            # add all selected models to the pending list in tinder
+            added = 0
+            for selected_index in self.plugin.selected_indices:
+                if selected_index in all_completed or selected_index in all_pending:
+                    continue
+
+                object_name = os.path.basename(self.plugin.og_df.loc[selected_index][path_column])
+                self.plugin.tinder_tab_obj.add_pending_model(object_name, selected_index)
+                added += 1 
+
+            status_msg(f"{added} designs added to Tinder selection")
