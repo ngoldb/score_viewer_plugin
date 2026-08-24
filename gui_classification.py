@@ -152,7 +152,8 @@ class ClassificationTab:
         for box in [settings_box, classify_box, export_box]:
             layout.addWidget(box)
     
-    
+    # TODO
+    # should I restart the tinder tab lists?
     def restart(self):
         self.plugin.good_models = np.array([], dtype=int)
         self.plugin.bad_models = np.array([], dtype=int)

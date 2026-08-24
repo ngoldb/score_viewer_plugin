@@ -90,6 +90,9 @@ class TinderTab:
             sync_with_pymol(self.plugin, selected_indices=[index], exclude_classified=False, use_og_df=True)
             self.current_item_name.setText(self.current_item.text())
 
+            # update window title
+            self.plugin.setWindowTitle("Score Viewer: Tinder Mode")
+
         else:
             self.start_btn.setText("Start Tinder Mode")
             self.plugin.tinder_state = False
@@ -99,6 +102,9 @@ class TinderTab:
             cmd.delete("all")
             self.current_item = QListWidgetItem("None")
             self.current_item_name.setText(self.current_item.text())
+            
+            # update window title
+            self.plugin.setWindowTitle("Score Viewer")
 
 
     def clear_pending(self):

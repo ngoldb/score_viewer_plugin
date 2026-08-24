@@ -58,6 +58,7 @@ class ScoreViewerPlugin(QDialog):
             self
         )
 
+        # TODO
         # currently only works in the score viewer window and only
         # if not in Settings tab
         self.left_shortcut.setContext(Qt.ApplicationShortcut)
