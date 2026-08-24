@@ -4,7 +4,6 @@
 from pymol import cmd
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QListWidget, QListWidgetItem
 from .utils import status_msg
 from .pymol_sync import sync_with_pymol
@@ -80,8 +79,6 @@ class TinderTab:
             
             self.start_btn.setText("Stop Tinder Mode")
             self.plugin.tinder_state = True
-            self.plugin.left_shortcut.setEnabled(True)
-            self.plugin.right_shortcut.setEnabled(True)
             status_msg("Starting Tinder Mode")
 
             # load first model as current model:    
@@ -96,8 +93,6 @@ class TinderTab:
         else:
             self.start_btn.setText("Start Tinder Mode")
             self.plugin.tinder_state = False
-            self.plugin.left_shortcut.setEnabled(False)
-            self.plugin.right_shortcut.setEnabled(False)
             status_msg("Exit Tinder Mode")
             cmd.delete("all")
             self.current_item = QListWidgetItem("None")
