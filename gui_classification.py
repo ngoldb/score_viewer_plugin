@@ -151,9 +151,8 @@ class ClassificationTab:
         # Layout
         for box in [settings_box, classify_box, export_box]:
             layout.addWidget(box)
+
     
-    # TODO
-    # should I restart the tinder tab lists?
     def restart(self):
         self.plugin.good_models = np.array([], dtype=int)
         self.plugin.bad_models = np.array([], dtype=int)
@@ -162,9 +161,10 @@ class ClassificationTab:
         self.bad_label.setText(f"{len(self.plugin.bad_models)}/{len(self.plugin.og_df)} bad models")
         self.good_models_list.clear()
         self.bad_models_list.clear()
+        self.plugin.tinder_tab_obj.completed_list.clear()
         status_msg("restarted calssification")
 
 
     def item_clicked(self, item):
         index = item.data(self.MODEL_INDEX)
-        sync_with_pymol(self.plugin, [index], False, True)        
+        sync_with_pymol(self.plugin, [index], False, True)
