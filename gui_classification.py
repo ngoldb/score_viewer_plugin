@@ -7,7 +7,7 @@ from pymol import cmd
 
 from .utils import status_msg
 from .pymol_sync import sync_with_pymol
-from .classification import classify, export_csv, copy_models, export_fasta
+from .classification import classify, export_csv, copy_models, export_fasta, update_model_lists
 
 # TODO
 # SCROLL LIST
@@ -168,3 +168,29 @@ class ClassificationTab:
     def item_clicked(self, item):
         index = item.data(self.MODEL_INDEX)
         sync_with_pymol(self.plugin, [index], False, True)
+
+
+    def save(self, state_dict):
+        state_dict['ClassifyTab'] = {
+            "exclude_classified": self.exclude_chk_box.isChecked(),
+            "fasta_name": self.fasta_name_combo.currentText(),
+            "fasta_seq": self.fasta_seq_combo.currentText(),
+            "seq_from_models": self.seq_from_models.isChecked(),
+            "seq_model": self.fasta_model.currentText(),
+            "seq_chain": self.fasta_chain.currentText()
+        }
+        return state_dict
+
+
+    def load(self, state_dict):
+        classify_settings = state_dict['ClassifyTab']
+        self.exclude_chk_box.setChecked(classify_settings['exclude_classified'])
+        self.fasta_name_combo.setCurrentIndex(self.fasta_name_combo.findText(classify_settings['fasta_name']))
+        self.fasta_seq_combo.setCurrentIndex(self.fasta_seq_combo.findText(classify_settings['fasta_seq']))
+        self.seq_from_models.setChecked(classify_settings['seq_from_models'])
+        self.fasta_model.setCurrentIndex(self.fasta_model.findText(classify_settings['seq_model']))
+        self.fasta_chain.setCurrentIndex(self.fasta_chain.findText(classify_settings['seq_chain']))
+
+        update_model_lists(self.plugin)
+
+        return

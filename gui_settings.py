@@ -11,19 +11,25 @@ class SettingTab:
         self.widget = QWidget()
         layout = QVBoxLayout(self.widget)
 
-        # Data Source Box
+        ## Data Source Box
         data_box = QGroupBox("Data Source")
         form = QFormLayout()
         self.load_btn = QPushButton("Browse")
         self.load_btn.clicked.connect(self.load_csv)
+        self.save_session_button = QPushButton("Save Session")
+        self.save_session_button.clicked.connect(self.plugin.save)
+        self.load_session_button = QPushButton("Load Session")
+        self.load_session_button.clicked.connect(self.plugin.load)
         self.csv_file_edit = QLineEdit(
             placeholderText='CSV file',
             readOnly=True
         )
         form.addRow("Load CSV:", self.load_btn)
         form.addRow("CSV File:", self.csv_file_edit)
+        form.addRow(self.save_session_button, self.load_session_button)
         data_box.setLayout(form)
 
+        ## Models Box
         models_box = QGroupBox("Models")
         form = QFormLayout()
 
@@ -83,8 +89,7 @@ class SettingTab:
         form.addRow(replacement_box)
         models_box.setLayout(form)
         
-
-        # Reference Structure Box
+        ## Reference Structure Box
         reference_box = QGroupBox("Reference Structure")
         form = QFormLayout()
         
@@ -112,7 +117,7 @@ class SettingTab:
 
         reference_box.setLayout(form)
 
-        # Appearance Box
+        ## Appearance Box
         appearance_box = QGroupBox("Appearance")
         form = QFormLayout()
         self.command_edit = QLineEdit(
@@ -137,9 +142,12 @@ class SettingTab:
         layout.addWidget(appearance_box)
 
 
-    def load_csv(self):
-        csv_path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
-        if not csv_path: return
+    def load_csv(self, csv_path=False):
+        if csv_path == False:
+            csv_path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV Files (*.csv)")
+            if not csv_path: return
+        else:
+            csv_path = csv_path
         df = pd.read_csv(csv_path)
         df.reset_index(drop=True, inplace=True)
         self.plugin.df = df
@@ -174,12 +182,70 @@ class SettingTab:
 
         status_msg(f"Loaded {len(df)} models")
 
-    def load_ref(self):
-        ref_path, _ = QFileDialog.getOpenFileName(None, "Open reference structure", "", "Structure Files (*.pdb *.cif)")
-        if not ref_path: return
+    def load_ref(self, ref_path=False):
+        if not ref_path:
+            ref_path, _ = QFileDialog.getOpenFileName(None, "Open reference structure", "", "Structure Files (*.pdb *.cif)")
+            if not ref_path: return
+        else:
+            ref_path = ref_path
         self.plugin.reference_structure = ref_path
         self.ref_file_edit.setText(str(ref_path))
         status_msg("loaded reference structure")
 
     def set_replace_text(self):
         self.plugin.path_replace = (self.path_replace.text(), self.path_with.text())
+
+
+    def save(self, state_dict):
+        state_dict["SettingTab"] = {
+            "csv_path": self.csv_file_edit.text(),
+            "models": [
+                [self.path_combo.currentText(), True, ""], 
+                [self.path_2_combo.currentText(), self.load_model_2_chkbox.isChecked(), self.model_2_suffix.text()], 
+                [self.path_3_combo.currentText(), self.load_model_3_chkbox.isChecked(), self.model_3_suffix.text()],
+                [self.path_replace.text(), self.path_with.text()]
+            ],
+            "reference": {
+                "ref_path": self.ref_file_edit.text(),
+                "align_ref": self.align_ref.isChecked(), 
+                "ref_color": self.ref_color_combo.currentText(), 
+                "ref_disp": self.ref_in_all_chckbox.isChecked()
+            },
+            "appearance": {
+                "load_command": self.command_edit.text(),
+                "grid_mode": self.grid_mode_chkbox.isChecked(),
+                "grouping": self.group_models_chkbox.isChecked()
+            }
+        }
+        return state_dict
+
+
+    def load(self, state_dict):
+        # load csv
+        self.load_csv(csv_path=state_dict["SettingTab"]["csv_path"])
+
+        # models
+        model_settings = state_dict["SettingTab"]["models"]
+        self.path_combo.setCurrentIndex(self.path_combo.findText(model_settings[0][0]))
+        self.path_2_combo.setCurrentIndex(self.path_2_combo.findText(model_settings[1][0]))
+        self.path_3_combo.setCurrentIndex(self.path_3_combo.findText(model_settings[2][0]))
+        self.load_model_2_chkbox.setChecked(model_settings[1][1])
+        self.load_model_3_chkbox.setChecked(model_settings[2][1])
+        self.path_replace.setText(model_settings[3][0])
+        self.path_with.setText(model_settings[3][1])
+
+        # reference 
+        ref_settings = state_dict["SettingTab"]["reference"]
+        if ref_settings["ref_path"]:
+            self.load_ref(ref_path=ref_settings["ref_path"])
+        self.align_ref.setChecked(ref_settings["align_ref"])
+        self.ref_color_combo.setCurrentIndex(self.ref_color_combo.findText(ref_settings["ref_color"]))
+        self.ref_in_all_chckbox.setChecked(ref_settings["ref_disp"])
+
+        # Appearance
+        appearance_settings = state_dict["SettingTab"]["appearance"]
+        self.command_edit.setText(appearance_settings["load_command"])
+        self.grid_mode_chkbox.setChecked(appearance_settings["grid_mode"])
+        self.group_models_chkbox.setChecked(appearance_settings["grouping"])
+
+        return

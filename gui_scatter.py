@@ -218,3 +218,36 @@ class ScatterTab:
                 added += 1 
 
             status_msg(f"{added} designs added to Tinder selection")
+
+
+    def save(self, state_dict):
+        state_dict["ScatterTab"] = {
+            "x_value": self.x_combo.currentText(),
+            "y_value": self.y_combo.currentText(),
+            "max_models": self.max_models_spin.value(),
+            "alpha": self.alpha_spin.value(),
+            "xmin": self.x_min_slider.value(),
+            "xmax": self.x_max_slider.value(),
+            "ymin": self.y_min_slider.value(),
+            "ymax": self.y_max_slider.value(),
+            "color_classification": self.color_classes.isChecked(),
+            "marker_size": self.marker_size_spin.value()
+        }
+        return state_dict
+
+
+    def load(self, state_dict):
+        scatter_settings = state_dict["ScatterTab"]
+        self.x_combo.setCurrentIndex(self.x_combo.findText(scatter_settings['x_value']))
+        self.y_combo.setCurrentIndex(self.y_combo.findText(scatter_settings['y_value']))
+        self.max_models_spin.setValue(scatter_settings['max_models'])
+        self.alpha_spin.setValue(scatter_settings['alpha'])
+        self.x_min_slider.setValue(scatter_settings['xmin'])
+        self.x_max_slider.setValue(scatter_settings['xmax'])
+        self.y_min_slider.setValue(scatter_settings['ymin'])
+        self.y_max_slider.setValue(scatter_settings['ymax'])
+        self.marker_size_spin.setValue(scatter_settings['marker_size'])
+        self.color_classes.setChecked(scatter_settings['color_classification'])
+        self.plot_scores()
+
+        return

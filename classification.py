@@ -71,6 +71,8 @@ def classify(plugin, good: bool, enabled: bool):
 
 
 def update_model_lists(plugin):
+    "updates the list of bad and good models in classification tab"
+    
     MODEL_INDEX = Qt.UserRole
     plugin.classify_tab_obj.good_models_list.clear()
     plugin.classify_tab_obj.bad_models_list.clear()
