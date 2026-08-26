@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QApplication, QFileDialog
-import pickle
+import json
 import numpy as np
 from .gui_scatter import ScatterTab
 from .gui_settings import SettingTab
@@ -55,14 +55,14 @@ class ScoreViewerPlugin(QDialog):
 
 
     def save(self):
-        save_path, _ = QFileDialog.getSaveFileName(None, "Choose Location", "", "SVS Files (*.svs)")
+        save_path, _ = QFileDialog.getSaveFileName(None, "Choose Location", "", "JSON Files (*.json)")
 
         status_msg("Save session...")
         state_dict = {
             "main": [
-                self.selected_indices, 
-                self.good_models, 
-                self.bad_models, 
+                self.selected_indices.tolist(), 
+                self.good_models.tolist(), 
+                self.bad_models.tolist(), 
                 self.tinder_state
             ]
         }
@@ -82,28 +82,28 @@ class ScoreViewerPlugin(QDialog):
         # TODO
         
         # write state dict
-        with open(save_path, 'wb') as f:
-            pickle.dump(state_dict, f)
+        with open(save_path, 'w') as f:
+            json.dump(state_dict, f)
 
         status_msg(f'saved session to {save_path}', color="green")
         return
 
 
     def load(self):
-        load_path, _ = QFileDialog.getOpenFileName(None, "Load Session", "", "SVS Files (*.svs)")
+        load_path, _ = QFileDialog.getOpenFileName(None, "Load Session", "", "JSON Files (*.json)")
         if not load_path: 
             return 
         status_msg("Loading session...")
 
         # load state dict
-        with open(load_path, 'rb') as f:
-            state_dict = pickle.load(f)
+        with open(load_path, 'r') as f:
+            state_dict = json.load(f)
 
         ## apply settings
         main_state = state_dict["main"]
-        self.selected_indices = main_state[0]
-        self.good_models = main_state[1]
-        self.bad_models = main_state[2]
+        self.selected_indices = np.array(main_state[0])
+        self.good_models = np.array(main_state[1])
+        self.bad_models = np.array(main_state[2])
         self.tinder_state = main_state[3]
 
         # Settings
