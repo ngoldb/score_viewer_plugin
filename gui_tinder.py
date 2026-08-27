@@ -111,6 +111,12 @@ class TinderTab:
         item.setData(self.MODEL_INDEX, model_index)
         self.pending_list.addItem(item)
 
+
+    def add_completed_model(self, text, model_index):
+        item = QListWidgetItem(text)
+        item.setData(self.MODEL_INDEX, model_index)
+        self.completed_list.addItem(item)
+
     
     def cycle_model(self, good: bool):
 
@@ -131,3 +137,38 @@ class TinderTab:
             sync_with_pymol(self.plugin, selected_indices=[selected_index], exclude_classified=False, use_og_df=True)
             self.current_item = next_item
             self.current_item_name.setText(self.current_item.text())
+
+
+    def save(self, state_dict):
+        pending_list = []
+        completed_list = []
+
+        for i in range(self.pending_list.count()):
+            item = self.pending_list.item(i)
+            pending_list.append([item.text(), int(item.data(self.MODEL_INDEX))]) # [display name, model index]
+
+        for i in range(self.completed_list.count()):
+            item = self.completed_list.item(i)
+            completed_list.append([item.text(), int(item.data(self.MODEL_INDEX))]) # [display name, model index]
+
+        state_dict['TinderTab'] = {
+            "pending_list": pending_list,
+            "completed_list": completed_list
+        }
+        return state_dict
+
+
+    def load(self, state_dict):
+        tinder_settings = state_dict['TinderTab']
+
+        for item_data in tinder_settings['pending_list']:
+            self.add_pending_model(item_data[0], item_data[1])
+
+        for item_data in tinder_settings['completed_list']:
+            self.add_completed_model(item_data[0], item_data[1])
+
+        # hacky but works
+        self.toggle_state()
+        self.toggle_state()
+
+        return 

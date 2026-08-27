@@ -79,7 +79,7 @@ class ScoreViewerPlugin(QDialog):
         state_dict = self.classify_tab_obj.save(state_dict)
 
         # Tinder
-        # TODO
+        state_dict = self.tinder_tab_obj.save(state_dict)
         
         # write state dict
         with open(save_path, 'w') as f:
@@ -119,7 +119,7 @@ class ScoreViewerPlugin(QDialog):
         self.classify_tab_obj.load(state_dict)
 
         # Tinder
-        # TODO
+        self.tinder_tab_obj.load(state_dict)
 
         status_msg(f"loaded {load_path}", color="green")
         return 
