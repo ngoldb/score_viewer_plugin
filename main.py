@@ -25,7 +25,7 @@ class ScoreViewerPlugin(QDialog):
         # Data containers
         self.df = None
         self.og_df = None
-        self.selected_indices = []
+        self.selected_indices = np.array([], dtype=int)
         self.all_filters = []
         self.good_models = np.array([], dtype=int)
         self.bad_models = np.array([], dtype=int)
@@ -70,7 +70,7 @@ class ScoreViewerPlugin(QDialog):
         state_dict = self.setting_tab_obj.save(state_dict)
 
         # Filters
-        # TODO
+        state_dict = self.filter_tab_obj.save(state_dict)
 
         # Scatter Plot
         state_dict = self.scatter_tab_obj.save(state_dict)
@@ -101,6 +101,7 @@ class ScoreViewerPlugin(QDialog):
 
         ## apply settings
         main_state = state_dict["main"]
+        
         self.selected_indices = np.array(main_state[0])
         self.good_models = np.array(main_state[1])
         self.bad_models = np.array(main_state[2])
@@ -110,7 +111,7 @@ class ScoreViewerPlugin(QDialog):
         self.setting_tab_obj.load(state_dict)
 
         # Filters
-        # TODO
+        self.filter_tab_obj.load(state_dict)
 
         # Scatter Plot
         self.scatter_tab_obj.load(state_dict)

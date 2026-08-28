@@ -168,7 +168,8 @@ class TinderTab:
             self.add_completed_model(item_data[0], item_data[1])
 
         # hacky but works
-        self.toggle_state()
-        self.toggle_state()
+        if self.plugin.tinder_state:
+            self.toggle_state()
+            self.toggle_state()
 
         return 

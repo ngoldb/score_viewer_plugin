@@ -9,6 +9,7 @@ class FilterTab:
         self.plugin = plugin
         self.widget = QWidget()
         layout = QVBoxLayout(self.widget)
+        self.data_filtered = False
 
         # Filter 1
         filter_1 = Filter(1, self.plugin)
@@ -54,15 +55,57 @@ class FilterTab:
         self.all_filter_label.setText(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs pass all filters")
 
         # call plotting function to update plot
+        # TODO positional selection changes --> wrong dots in scatter plot are highlighted
+        #      - reset entire selection (as in except block)
+        #.     - correct positional selection
         try: 
             self.plugin.scatter_tab_obj.plot_scores()
         except IndexError as err:
             # this is because previously selected data points are not in the filtered df anymore
             # need to reset lasso selection
             self.plugin.scatter_tab_obj.positional_selected = []
+            self.plugin.selected_indices = []
             self.plugin.scatter_tab_obj.plot_scores()
 
         status_msg(f"{self.plugin.df.shape[0]}/{self.plugin.og_df.shape[0]} designs pass all filters")
+
+
+    def save(self, state_dict):
+        filters = []
+
+        for filter in self.plugin.all_filters:
+            filters.append(
+                [
+                    filter.score_combo.currentText(),
+                    filter.min_spin.value(),
+                    filter.max_spin.value(),
+                    filter.chkbox.isChecked()
+                ]
+            )
+
+        filter_settings = {
+            "filters": filters,
+            "is_filtered": self.data_filtered
+        }
+        state_dict['FilterTab'] = filter_settings
+
+        return state_dict
+
+
+    def load(self, state_dict):
+        filter_settings = state_dict["FilterTab"]
+        filters = filter_settings['filters']
+
+        for i, filter in enumerate(self.plugin.all_filters):
+            filter.score_combo.setCurrentIndex(filter.score_combo.findText(filters[i][0]))
+            filter.min_spin.setValue(filters[i][1])
+            filter.max_spin.setValue(filters[i][2])
+            filter.chkbox.setChecked(filters[i][3])
+
+        if filter_settings['is_filtered']:
+            self.filter_data()
+
+        return 
 
 
 class Filter:
