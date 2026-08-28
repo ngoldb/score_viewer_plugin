@@ -20,6 +20,9 @@ class FilterTab:
         # Filter 3
         filter_3 = Filter(3, self.plugin)
 
+        # Filter 4
+        filter_4 = Filter(4, self.plugin)
+
         # Filter Button
         self.filter_data_button = QPushButton("Filter Data")
         self.filter_data_button.clicked.connect(self.filter_data)
@@ -27,17 +30,18 @@ class FilterTab:
         self.filter_data_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.all_filter_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
 
-        layout.addWidget(filter_1.filter_box)
-        layout.addWidget(filter_2.filter_box)
-        layout.addWidget(filter_3.filter_box)
-        layout.addWidget(self.filter_data_button)
-        layout.addWidget(self.all_filter_label)
-
         self.plugin.all_filters = [
             filter_1,
             filter_2,
-            filter_3
+            filter_3,
+            filter_4
         ]
+
+        for filter in self.plugin.all_filters:
+            layout.addWidget(filter.filter_box)
+
+        layout.addWidget(self.filter_data_button)
+        layout.addWidget(self.all_filter_label)
     
     def filter_data(self):
         try:
